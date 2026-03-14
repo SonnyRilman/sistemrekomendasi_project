@@ -1,0 +1,555 @@
+{
+  "info": {
+    "_postman_id": "81212552-2fc2-4ca6-bca6-2ef298a2376e",
+    "name": "Flask - Minimal",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "15236434"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIzNTQwMCwianRpIjoiZjVkN2FiZTAtNDhlMS00MTdhLWEzNmUtYWI3YzUyMDExOGRlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIzNTQwMCwiY3NyZiI6IjgxM2M1MDQ1LTdiOGItNDk5Ny1iZGMxLWJhNWFkNzg4MTM4MiIsImV4cCI6MTc3MzMyMTgwMH0.6VfHMGpBEfwfcjK3eF7QFN_ABdLSd9Zmr4_3QbBzLiE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/users",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIxNTAzNiwianRpIjoiODE5Nzk5MTEtMDA0ZC00ZTVlLWEyNWItZDU3NjZiMDM5MDRlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIxNTAzNiwiY3NyZiI6ImNhN2ViM2FmLTM3N2MtNDIzYi04ZWExLTY4YWM4NmM4ZjMzOSIsImV4cCI6MTc3MzIxNTkzNn0.aeWp_NRsEY7aqtSSzbjCQbbOzETzVIx_G8LMZRsOXEo",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/users/1",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIzMzMwNiwianRpIjoiMTQ5MzllYzYtYTQwZC00MDRiLWE4MDgtYzlmMjZhMjI3NGEzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIzMzMwNiwiY3NyZiI6ImFlMjEwNGQzLTAwZDktNGM2Ny1iMTZhLTUwMzBjM2YyMTA3ZCIsImV4cCI6MTc3MzIzNDIwNn0.BsknkDVY8p5xIyDjOKkfntWuVX9D1zOkneE1ZU7V8H8",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Adrian Hadinata Hadi Darsono\",\r\n    \"email\": \"adrianhhd@gmail.com\",\r\n    \"password\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/users",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIzNDIzMSwianRpIjoiYWFmOGI4Y2ItNTM0YS00ZDE5LWJiZjYtMjhiY2Y0ZTAzOGVhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIzNDIzMSwiY3NyZiI6ImJmMzY2NWI4LWEyZWMtNGQyMS04ZTVmLWY0N2E0ZjE2MTA4NiIsImV4cCI6MTc3MzIzNTEzMX0.WB3pfgWTK-SFJHnpPDC3bWKfiMc4J-pCL1OvmMpF0JM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Adrian Noto Boto Sewu\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/users/1",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIzNTQwMCwianRpIjoiZjVkN2FiZTAtNDhlMS00MTdhLWEzNmUtYWI3YzUyMDExOGRlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIzNTQwMCwiY3NyZiI6IjgxM2M1MDQ1LTdiOGItNDk5Ny1iZGMxLWJhNWFkNzg4MTM4MiIsImV4cCI6MTc3MzMyMTgwMH0.6VfHMGpBEfwfcjK3eF7QFN_ABdLSd9Zmr4_3QbBzLiE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Adrian Hadinata Hadi Darsono\",\r\n    \"email\": \"adrianhhd@gmail.com\",\r\n    \"password\": \"admin\"\r\n}"
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/users/10",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "users",
+                "10"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"adrian@mail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/auth/login",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Imports",
+      "item": [
+        {
+          "name": "Import Products",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIzNzMyMSwianRpIjoiYWRmYmU3OTItMmM2Ni00ZmY3LWEyMWQtMWZlZjc5M2IzZmZhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIzNzMyMSwiY3NyZiI6IjZkMDVkNDNlLTg2MjUtNGI3Yy1iMTBiLWJkMDE1YmNjMGZlYSIsImV4cCI6MTc3MzMyMzcyMX0.rSkhEXw2NVgnC01tyBFaLIxUoalUSBxF1RSZyS7G_l4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/import/import_products",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "import",
+                "import_products"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Preprocessing",
+      "item": [
+        {
+          "name": "Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/name",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "name"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ingredient",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/ingredients",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "ingredients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Brand",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/brand",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "brand"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Shade",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/shades",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "shades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Category",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/category",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "category"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Price",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/price",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "price"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rating",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/rating",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "rating"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/all",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Excel",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/export_excel",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "export_excel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/products",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIxNTAzNiwianRpIjoiODE5Nzk5MTEtMDA0ZC00ZTVlLWEyNWItZDU3NjZiMDM5MDRlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIxNTAzNiwiY3NyZiI6ImNhN2ViM2FmLTM3N2MtNDIzYi04ZWExLTY4YWM4NmM4ZjMzOSIsImV4cCI6MTc3MzIxNTkzNn0.aeWp_NRsEY7aqtSSzbjCQbbOzETzVIx_G8LMZRsOXEo",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/products/1",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Hello World",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/hello",
+          "host": [
+            "https://flask-sistem-rekomendai-product.onrender.com/api"
+          ],
+          "path": [
+            "hello"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -4,10 +4,8 @@ Backend API minimalist menggunakan Flask untuk mendukung sistem rekomendasi skin
 
 ## 🚀 Fitur Utama
 
-- **Otentikasi**: Registrasi dan Login menggunakan JWT (JSON Web Token).
 - **CRUD Produk**: Manajemen data skincare dengan spesifikasi lengkap.
-- **Data Preprocessing**: Pipeline otomatis untuk menghitung TF-IDF dari fitur produk (Name, Ingredients, Brand, Shades).
-- **Export Data**: Ekspor hasil preprocessing ke format Excel (.xlsx) dengan tata letak yang sesuai untuk analisis lanjutan.
+- **Recommendation System**: Sistem rekomendasi skincare menggunakan TF-IDF dan Cosine Similarity.
 
 ## 🛠️ Prasyarat
 
@@ -56,20 +54,10 @@ python run.py
 ```
 Aplikasi akan berjalan di `http://localhost:5000`.
 
-## 🧪 Dokumentasi Endpoint Preprocessing
-
-Berikut adalah beberapa endpoint utama untuk pra-pemrosesan data skincare:
-
-| Method | Endpoint | Deskripsi |
-| :--- | :--- | :--- |
-| `POST` | `/api/preprocessing/all` | Mengembalikan matriks gabungan TF-IDF dalam format JSON. |
-| `POST` | `/api/preprocessing/export_excel` | Menghasilkan file `.xlsx` dari hasil preprocessing. |
-| `POST` | `/api/preprocessing/name` | Preprocessing spesifik untuk nama produk. |
-| `POST` | `/api/preprocessing/ingredients` | Preprocessing spesifik untuk bahan produk. |
-
 ## 📂 Struktur Proyek
 - `app/models/`: Definisi tabel database (SQLAlchemy).
 - `app/routes/`: Logika endpoint API.
-- `app/utils/`: Fungsi pembantu dan core logic (SkincarePreprocessor).
+- `app/utils/`: Fungsi pembantu dan core logic.
 - `app/schemas/`: Validasi data menggunakan Marshmallow.
+- `docs/`: Dokumentasi API.
 - `collab/`: Dokumentasi dan riset asli (Notebook Google Colab).

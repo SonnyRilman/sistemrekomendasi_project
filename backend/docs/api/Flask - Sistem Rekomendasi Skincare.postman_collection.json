@@ -1,0 +1,142 @@
+{
+  "info": {
+    "_postman_id": "4376742b-fc16-4bcf-9623-e68d9dd7d2d3",
+    "name": "Flask - Sistem Rekomendasi Skincare",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "15236434"
+  },
+  "item": [
+    {
+      "name": "Imports",
+      "item": [
+        {
+          "name": "Import Products",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIzNzMyMSwianRpIjoiYWRmYmU3OTItMmM2Ni00ZmY3LWEyMWQtMWZlZjc5M2IzZmZhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIzNzMyMSwiY3NyZiI6IjZkMDVkNDNlLTg2MjUtNGI3Yy1iMTBiLWJkMDE1YmNjMGZlYSIsImV4cCI6MTc3MzMyMzcyMX0.rSkhEXw2NVgnC01tyBFaLIxUoalUSBxF1RSZyS7G_l4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/import/import_products",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "import",
+                "import_products"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/products",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3MzIxNTAzNiwianRpIjoiODE5Nzk5MTEtMDA0ZC00ZTVlLWEyNWItZDU3NjZiMDM5MDRlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkcmlhbkBtYWlsLmNvbSIsIm5iZiI6MTc3MzIxNTAzNiwiY3NyZiI6ImNhN2ViM2FmLTM3N2MtNDIzYi04ZWExLTY4YWM4NmM4ZjMzOSIsImV4cCI6MTc3MzIxNTkzNn0.aeWp_NRsEY7aqtSSzbjCQbbOzETzVIx_G8LMZRsOXEo",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/products/1",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rekomendasi",
+      "item": [
+        {
+          "name": "Start",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"kategori_produk\": \"lipstick\",\r\n    \"rating\": 4,\r\n    \"pilihan_ingredients\": [\"magnesium\", \"octenylsuccinate\", \"sodium\", \"lactate\", \"sucrose\"],\r\n    \"budget_max\": 1000000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/preprocessing/rekomendasi_start",
+              "host": [
+                "https://flask-sistem-rekomendai-product.onrender.com/api"
+              ],
+              "path": [
+                "preprocessing",
+                "rekomendasi_start"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Hello World",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://flask-sistem-rekomendai-product.onrender.com/api/hello",
+          "host": [
+            "https://flask-sistem-rekomendai-product.onrender.com/api"
+          ],
+          "path": [
+            "hello"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

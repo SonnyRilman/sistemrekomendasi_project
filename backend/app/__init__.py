@@ -6,7 +6,6 @@ from flask_cors import CORS
 
 # tambahkan error handler
 from flask import jsonify
-from flask_jwt_extended import JWTManager
 
 import os
 
@@ -57,21 +56,12 @@ def create_app():
     def server_error(e):
         return jsonify({'error': 'Internal Server Error'}), 500
 
-    jwt = JWTManager()
-
     # initialisasi JWT, SQL Alchemy, dan CORS
-    jwt.init_app(app)
     db.init_app(app)
     CORS(app)
 
-    from app.routes.user_routes import user_bp
-    app.register_blueprint(user_bp, url_prefix='/api/users')
-
     from app.routes.hello import hello_bp
     app.register_blueprint(hello_bp, url_prefix='/api/hello')
-
-    from app.routes.auth_routes import auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     from app.routes.import_routes import import_bp
     app.register_blueprint(import_bp, url_prefix='/api/import')

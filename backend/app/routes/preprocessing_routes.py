@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify, send_file
 from app import db
 from app.models.product import Product
-from app.utils.product_utils import SkincarePreprocessor
+from app.utils.preprocessing_utils import load_preprocessing_data_price, load_preprocessing_data_rating, load_preprocessing_data_ingredients_tfidf
 import pandas as pd
 import io
+import numpy as np
 
 preprocessing_bp = Blueprint('preprocessing', __name__)
 
@@ -22,145 +23,104 @@ def get_products_as_df(ids=None):
     df['Rating'] = pd.to_numeric(df['Rating'], errors='coerce')
     return df
 
-@preprocessing_bp.route('/name', methods=['POST'])
-def preprocess_name():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    counts, tf, tfidf, idf = SkincarePreprocessor.process_text_tfidf(df['name'], use_log=False)
-    return jsonify({
-        'counts': counts.to_dict(orient='records'),
-        'tf': tf.to_dict(orient='records'),
-        'tfidf': tfidf.to_dict(orient='records'),
-        'idf': idf.to_dict()
-    })
+@preprocessing_bp.route('/rekomendasi_start', methods=['POST'])
+def rekomendasi_start():
+    # Inputan dari user
+    data = request.get_json()
+    kategori_produk = data.get('kategori_produk')
+    rating = data.get('rating')
+    pilihan_ingredients = data.get('pilihan_ingredients')
+    budget_max = data.get('budget_max')
 
-@preprocessing_bp.route('/ingredients', methods=['POST'])
-def preprocess_ingredients():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    counts, tf, tfidf, idf = SkincarePreprocessor.process_text_tfidf(df['ingredients'], use_log=False)
-    return jsonify({
-        'counts': counts.to_dict(orient='records'),
-        'tf': tf.to_dict(orient='records'),
-        'tfidf': tfidf.to_dict(orient='records'),
-        'idf': idf.to_dict()
-    })
+    # panggi fungsi get_products_as_df untuk load semua data
+    df_all = get_products_as_df()
 
-@preprocessing_bp.route('/brand', methods=['POST'])
-def preprocess_brand():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    counts, tf, tfidf, idf = SkincarePreprocessor.process_text_tfidf(df['brand'], use_log=True)
-    return jsonify({
-        'counts': counts.to_dict(orient='records'),
-        'tf': tf.to_dict(orient='records'),
-        'tfidf': tfidf.to_dict(orient='records'),
-        'idf': idf.to_dict()
-    })
+    # Filter tahap pertama data berdasarkan input "Kaku" (Category & Budget)
+    eligible_products = df_all[
+        (df_all['Category'] == kategori_produk) & 
+        (df_all['price'] <= budget_max) &
+        (df_all['Rating'] >= rating)
+    ]
 
-@preprocessing_bp.route('/shades', methods=['POST'])
-def preprocess_shades():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    counts, tf, tfidf, idf = SkincarePreprocessor.process_text_tfidf(df['shades'], use_log=True)
-    return jsonify({
-        'counts': counts.to_dict(orient='records'),
-        'tf': tf.to_dict(orient='records'),
-        'tfidf': tfidf.to_dict(orient='records'),
-        'idf': idf.to_dict()
-    })
+    # Ambil Nama Produk yang lolos filter untuk mencocokkan di matriks TF-IDF
+    product_names = eligible_products['name'].tolist()
 
-@preprocessing_bp.route('/category', methods=['POST'])
-def preprocess_category():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    df_cat = SkincarePreprocessor.process_category(df['Category'])
-    return jsonify(df_cat.to_dict(orient='records'))
+    # Panggil utils preprocessing_utils
+    df_price = load_preprocessing_data_price()
+    max_price = df_price['price'].max()
+    min_price = df_price['price'].min()
 
-@preprocessing_bp.route('/price', methods=['POST'])
-def preprocess_price():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    df_price = SkincarePreprocessor.normalize_numeric(df, 'price')
-    return jsonify(df_price.to_dict(orient='records'))
+    df_rating = load_preprocessing_data_rating()
+    max_rating = df_rating['Rating'].max()
+    min_rating = df_rating['Rating'].min()
 
-@preprocessing_bp.route('/rating', methods=['POST'])
-def preprocess_rating():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    df_rating = SkincarePreprocessor.normalize_numeric(df, 'Rating')
-    return jsonify(df_rating.to_dict(orient='records'))
+    df_ingredients_tfidf = load_preprocessing_data_ingredients_tfidf()
 
-@preprocessing_bp.route('/all', methods=['POST'])
-def preprocess_all():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
-    
-    merged = SkincarePreprocessor.get_merged_tfidf_matrix(df)
-    
-    return jsonify({
-        'merged_matrix': merged.to_dict(orient='records')
-    })
+    # Buang 'Ingredient Number' dan 'Ingredient Name' (2 kolom pertama)
+    feature_columns = df_ingredients_tfidf.columns[2:] 
 
-@preprocessing_bp.route('/export_excel', methods=['POST'])
-def export_excel():
-    df = get_products_as_df(request.get_json().get('ids'))
-    if df.empty: return jsonify({'error': 'No products found'}), 404
+    # Buat vector sepanjang jumlah kolom df_ingredients_tfidf
+    user_vector = np.zeros(len(feature_columns))
+
+    # Isi angka 1 jika bahan pilihan user ada di daftar df_ingredients_tfidf
+    for ing in pilihan_ingredients:
+        if ing in feature_columns:
+            # Cari posisi index df_ingredients_tfidf tersebut
+            col_idx = feature_columns.get_loc(ing)
+            user_vector[col_idx] = 1
+
+    # Hitung Skor Kemiripan (Cosine Similarity)
+    recommendations = []
     
-    # Generate TF-IDFs with consistent names to ensure column alignment
-    _, _, tfidf_n, _ = SkincarePreprocessor.process_text_tfidf(df['name'], use_log=False, names=df['name'])
-    _, _, tfidf_i, _ = SkincarePreprocessor.process_text_tfidf(df['ingredients'], use_log=False, names=df['name'])
-    _, _, tfidf_b, _ = SkincarePreprocessor.process_text_tfidf(df['brand'], use_log=True, names=df['name'])
-    _, _, tfidf_s, _ = SkincarePreprocessor.process_text_tfidf(df['shades'], use_log=True, names=df['name'])
-    
-    # Create Excel file in memory
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        start_row = 0
-        sheet_name = 'All Merged Preprocessing Data'
+    # Beri kode "P1, P2, dst" pada data DB agar sinkron dengan baris Excel
+    df_all_with_code = df_all.copy()
+    df_all_with_code['product_code'] = [f"P{i+1}" for i in range(len(df_all_with_code))]
+
+    # Ambil daftar kode produk yang lolos filter awal
+    eligible_codes = df_all_with_code[df_all_with_code['id'].isin(eligible_products['id'])]['product_code'].values
+
+    for index, row in df_ingredients_tfidf.iterrows():
+        # AMBIL BERDASARKAN KODE (P1, P2...)
+        p_code = row['Ingredient Number'] # Kode Produk
         
-        # Label (seperti baris 2135 di notebook)
-        pd.DataFrame([['Pivot and Merged Preprocessing Data:']]).to_excel(writer, sheet_name=sheet_name, startrow=start_row, header=False, index=False)
-        start_row += 2
+        # Cek apakah kode produk ini termasuk yang lolos filter awal
+        if p_code in eligible_codes:
+            # Ambil vector fitur produk ini (kolom 2 ke atas)
+            product_vector = row[2:].values.astype(float)
+            
+            # Hitung Cosine Similarity
+            # Membandingkan daftar bahan (ingredients) yang User pilih (user_vector) dengan bahan yang ada di sebuah produk (product_vector
+            dot_product = np.dot(user_vector, product_vector)
 
-        def prepare_for_excel(df_tfidf, group_name):
-            pivoted = SkincarePreprocessor.pivot_tfidf(df_tfidf, "Product").reset_index()
-            pivoted['Group'] = group_name
-            # Move Group and Term to the front
-            cols = ['Group', 'Term'] + [c for c in pivoted.columns if c not in ['Group', 'Term']]
-            return pivoted[cols]
+            # Menghitung "Bobot Keinginan user".
+            norm_user = np.linalg.norm(user_vector)
+            
+            # Menghitung "Bobot Produk".
+            norm_product = np.linalg.norm(product_vector)
+            
+            similarity = 0
+            if norm_user > 0 and norm_product > 0:
+                # Skor = Titik Temu / (Bobot User * Bobot Produk)
+                similarity = dot_product / (norm_user * norm_product)
+            
+            # Ambil detail produk asli dari database menggunakan kode pencocokan
+            match_row = df_all_with_code[df_all_with_code['product_code'] == p_code].iloc[0]
+            product_info = match_row.to_dict()
+            product_info['similarity_score'] = round(float(similarity), 4)
+            recommendations.append(product_info)
 
-        # 1. Products (Header = True)
-        p_name = prepare_for_excel(tfidf_n, 'Product')
-        p_name.to_excel(writer, sheet_name=sheet_name, startrow=start_row, index=False)
-        start_row += len(p_name)
+    # Urutkan hasil berdasarkan skor tertinggi
+    recommendations = sorted(recommendations, key=lambda x: x['similarity_score'], reverse=True)
 
-        # 2. Brands (Header = False)
-        p_brand = prepare_for_excel(tfidf_b, 'Brand')
-        p_brand.to_excel(writer, sheet_name=sheet_name, startrow=start_row, index=False, header=False)
-        start_row += len(p_brand)
-
-        # 3. Shades (Header = False)
-        p_shades = prepare_for_excel(tfidf_s, 'Shade')
-        p_shades.to_excel(writer, sheet_name=sheet_name, startrow=start_row, index=False, header=False)
-        start_row += len(p_shades)
-
-        # 4. Ingredients (Header = False)
-        p_ingred = prepare_for_excel(tfidf_i, 'Ingredient')
-        p_ingred.to_excel(writer, sheet_name=sheet_name, startrow=start_row, index=False, header=False)
-        
-    output.seek(0)
-    
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name='all_pivoted_data.xlsx'
-    )
+    return jsonify({
+        'eligible_products': eligible_products.to_dict(orient='records'),
+        'input_user': {
+            'kategori_produk': kategori_produk,
+            'rating': rating,
+            'pilihan_ingredients': pilihan_ingredients,
+            'budget_max': budget_max
+        },
+        'status': 'success',
+        'count': len(recommendations),
+        'results': recommendations
+    })

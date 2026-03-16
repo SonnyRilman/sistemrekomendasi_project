@@ -1,236 +1,348 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Database, Layers, Cpu } from 'lucide-react';
-import { BRANDS, CATEGORIES, SKIN_TYPES, SHADES } from '../data/products';
+import { Search, ChevronRight, CheckCircle2, Sparkles, Droplets, ShieldCheck, Zap, Beaker, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CATEGORIES } from '../data/products';
+import { clsx } from 'clsx';
 
 const Home = () => {
   const navigate = useNavigate();
+  const [isScanning, setIsScanning] = useState(false);
   const [preferences, setPreferences] = useState({
-    category: '',
-    brand: '',
-    skinType: '',
-    shade: '',
+    category: 'foundation',
+    rating: 4,
+    ingredients: [],
     priceRange: '300000',
   });
+
+  const INGREDIENT_GROUPS = [
+    { 
+      label: 'Brightening', 
+      icon: <Sparkles size={14} />,
+      items: ["niacinamide", "tocopherol"] 
+    },
+    { 
+      label: 'Hydration & Barrier', 
+      icon: <Droplets size={14} />,
+      items: ["glycerin", "squalane", "ceramide", "hyaluronate"] 
+    },
+    { 
+      label: 'Treatment', 
+      icon: <Zap size={14} />,
+      items: ["salicylic"] 
+    },
+    { 
+      label: 'Protection & Base', 
+      icon: <ShieldCheck size={14} />,
+      items: ["titanium", "zinc", "oxide"] 
+    }
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPreferences((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleIngredientChange = (ing) => {
+    setPreferences(prev => {
+      const current = [...prev.ingredients];
+      if (current.includes(ing)) {
+        return { ...prev, ingredients: current.filter(i => i !== ing) };
+      } else {
+        return { ...prev, ingredients: [...current, ing] };
+      }
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/recommendations', { state: { preferences } });
+    setIsScanning(true);
+    
+    // Artificial scanning delay for "WOW" effect
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const payload = {
+      kategori_produk: preferences.category,
+      rating: parseFloat(preferences.rating),
+      pilihan_ingredients: preferences.ingredients,
+      budget_max: parseInt(preferences.priceRange)
+    };
+    navigate('/recommendations', { state: { payload } });
   };
 
   return (
-    <div className="bg-white overflow-x-hidden">
-      {/* Hero Section - Refined Proportions */}
-      <section className="relative pt-20 pb-12 md:pb-24 overflow-hidden">
-        <div className="section-container grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-10 animate-fade-up">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="h-[1px] w-8 bg-brand-500"></div>
-                <h2 className="text-brand-600 font-bold uppercase tracking-[0.3em] text-[10px]">
-                  Sistem Rekomendasi Produk Makeup
-                </h2>
-              </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-black leading-[1.1] text-neutral-900 tracking-tight">
-                Pilih Pesona <br />
-                <span className="italic font-normal text-brand-600">Terbaik</span> Anda.
-              </h1>
+    <div className="bg-[#f5f5f5] min-h-screen">
+      
+      {/* Dynamic Hero Section - High End Visual */}
+      <section className="relative h-[70vh] flex items-center overflow-hidden bg-neutral-900">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/skincare_lab_hero_minimalist_1773682856998.png" 
+            className="w-full h-full object-cover opacity-50 contrast-125 scale-105"
+            alt="Lab Background"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#f5f5f5] via-neutral-900/50 to-neutral-900/70"></div>
+          {/* Animated scanning line for hero */}
+          <motion.div 
+            animate={{ top: ['0%', '100%', '0%'] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute left-0 right-0 h-[10vh] bg-primary/10 blur-3xl z-10 pointer-events-none"
+          />
+        </div>
+
+        <div className="section-container relative z-10 w-full">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl space-y-8"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full border border-white/10">
+              <Beaker size={16} className="text-primary animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Advanced Analysis Protocol v2.0</span>
             </div>
-            
-            <p className="text-base text-neutral-500 max-w-sm leading-relaxed font-light italic">
-              "Teknologi cerdas untuk kulit unik Anda. Temukan harmoni sempurna melalui algoritma presisi."
+            <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.85] uppercase tracking-tighter">
+              Digital <br/> <span className="text-primary italic">Skin Lab</span>
+            </h1>
+            <p className="text-xl text-neutral-300 font-medium leading-relaxed max-w-xl">
+              Precision skincare recommendations powered by <b>Content-Based Filtering</b> and molecular similarity profiling.
             </p>
-
-            <div className="flex items-center space-x-6">
-              <a href="#consultation" className="btn-primary flex items-center">
-                Mulai Konsultasi
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-              <button 
-                onClick={() => navigate('/products')} 
-                className="btn-secondary"
-              >
-                Lihat Katalog
-              </button>
-            </div>
-
-            <div className="flex items-center space-x-12 pt-4 border-t border-neutral-50 max-w-sm">
-                <div className="text-center">
-                    <p className="text-2xl font-serif font-bold text-neutral-900">12k+</p>
-                    <p className="text-[10px] text-neutral-400 uppercase tracking-widest">Katalog</p>
-                </div>
-                <div className="text-center">
-                    <p className="text-2xl font-serif font-bold text-neutral-900">99.8%</p>
-                    <p className="text-[10px] text-neutral-400 uppercase tracking-widest">Akurasi</p>
-                </div>
-            </div>
-          </div>
-
-          <div className="relative hidden lg:block animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            <div className="absolute -top-10 -right-10 w-64 h-64 bg-brand-100/50 rounded-full blur-3xl -z-10"></div>
-            <div className="luxury-card p-3 rotate-1 hover:rotate-0 transition-transform duration-700">
-              <img
-                src="/hero.png"
-                alt="Luxury Makeup"
-                className="rounded-xl aspect-square object-cover"
-              />
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Brand Bar - Subtle & Neat */}
-      <section className="bg-neutral-50 py-10 border-y border-neutral-100">
-        <div className="section-container flex flex-wrap justify-between items-center gap-8 opacity-40 grayscale">
-           {['WARDAH', 'MAKE OVER', 'EMINA', 'SOMETHINC', 'MAYBELLINE', 'PURBASARI'].map(brand => (
-             <span key={brand} className="text-sm font-serif font-black tracking-widest">{brand}</span>
-           ))}
-        </div>
-      </section>
+      {/* Main Consultation Area */}
+      <main className="section-container -mt-24 pb-40 relative z-20">
+        <div className="grid lg:grid-cols-12 gap-10 items-start">
+          
+          {/* Left: Input Form Card */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="lg:col-span-8 bg-white border border-neutral-200 rounded-[3rem] p-12 md:p-16 shadow-xl shadow-neutral-900/5 relative overflow-hidden"
+          >
+            {/* Scanning Overlay */}
+            <AnimatePresence>
+              {isScanning && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-50 bg-white/80 backdrop-blur-md flex flex-col items-center justify-center space-y-6"
+                >
+                  <div className="relative">
+                    <div className="w-24 h-24 border-4 border-neutral-100 border-t-primary rounded-full animate-spin"></div>
+                    <Search className="absolute inset-0 m-auto text-primary" size={32} />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-xl font-black uppercase tracking-tighter">Scanning Database...</h3>
+                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Applying Cosine Similarity Vectors</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-      {/* Methodology Section - Scientific & Minimalist */}
-      <section className="section-container py-32 space-y-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          <div className="space-y-6 group">
-            <div className="w-10 h-10 bg-neutral-900 text-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg shadow-neutral-200">
-                <Database className="h-5 w-5" />
-            </div>
-            <div className="space-y-2">
-                <h3 className="text-lg font-bold uppercase tracking-widest text-neutral-900">Analisis</h3>
-                <p className="text-neutral-500 font-light text-sm leading-relaxed">Ekstraksi data mikroskopis dari shade dan bahan aktif untuk mengenali karakteristik unik.</p>
-            </div>
-          </div>
-          <div className="space-y-6 group">
-            <div className="w-10 h-10 bg-neutral-900 text-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg shadow-neutral-200">
-                <Layers className="h-5 w-5" />
-            </div>
-            <div className="space-y-2">
-                <h3 className="text-lg font-bold uppercase tracking-widest text-neutral-900">Komputasi</h3>
-                <p className="text-neutral-500 font-light text-sm leading-relaxed">Menghitung skor kedekatan antara preferensi profil kulit dan koleksi database kami.</p>
-            </div>
-          </div>
-          <div className="space-y-6 group">
-            <div className="w-10 h-10 bg-neutral-900 text-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg shadow-neutral-200">
-                <Cpu className="h-5 w-5" />
-            </div>
-            <div className="space-y-2">
-                <h3 className="text-lg font-bold uppercase tracking-widest text-neutral-900">Kurasi</h3>
-                <p className="text-neutral-500 font-light text-sm leading-relaxed">Memberikan rekomendasi Top-N produk dengan tingkat harmoni tertinggi bagi Anda.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Skin Education - Beautiful Card Layout */}
-      <section className="bg-nude-50 py-32 border-y border-nude-100">
-        <div className="section-container grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-10 order-2 lg:order-1">
-                <div className="relative aspect-[3/4] rounded-3xl overflow-hidden luxury-card border-8 border-white p-0">
-                    <img 
-                        src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800" 
-                        alt="Skin Education" 
-                        className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-1000"
-                    />
-                </div>
-            </div>
-            <div className="space-y-10 order-1 lg:order-2">
+            <form onSubmit={handleSubmit} className="space-y-16">
+              <div className="grid md:grid-cols-2 gap-12">
                 <div className="space-y-4">
-                    <span className="text-accent-gold font-bold uppercase tracking-[0.4em] text-[9px]">The Skin Guide</span>
-                    <h2 className="text-5xl font-serif leading-tight">Pahami <span className="italic serif">Kebutuhan</span> <br/> Kulit Anda.</h2>
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] ml-2">Target Category</label>
+                  <select 
+                    name="category" 
+                    value={preferences.category} 
+                    onChange={handleChange} 
+                    className="w-full bg-neutral-50 border-none rounded-2xl px-6 py-5 outline-none focus:ring-4 focus:ring-primary/5 transition-all text-xl font-black uppercase tracking-tight" 
+                    required
+                  >
+                    {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                  </select>
                 </div>
-                <div className="grid grid-cols-1 gap-8">
-                    {[
-                        { type: 'Oily', desc: 'Produk light-weight & matte control.' },
-                        { type: 'Dry', desc: 'Produk dewy & hidrasi berkelanjutan.' },
-                        { type: 'Combination', desc: 'Balance antara kontrol minyak & moisturizer.' }
-                    ].map(skin => (
-                        <div key={skin.type} className="flex space-x-6 group">
-                            <div className="text-accent-gold font-serif font-black italic text-2xl opacity-20 transition-opacity group-hover:opacity-100">0{['Oily','Dry','Combination'].indexOf(skin.type)+1}</div>
-                            <div className="space-y-1 pt-1">
-                                <h4 className="font-bold text-neutral-900 uppercase tracking-widest text-xs">{skin.type} Skin</h4>
-                                <p className="text-neutral-500 font-light text-sm">{skin.desc}</p>
-                            </div>
-                        </div>
-                    ))}
+
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] ml-2">Satisfaction Threshold</label>
+                  <select 
+                    name="rating" 
+                    value={preferences.rating} 
+                    onChange={handleChange} 
+                    className="w-full bg-neutral-50 border-none rounded-2xl px-6 py-5 outline-none focus:ring-4 focus:ring-primary/5 transition-all text-xl font-black"
+                  >
+                    {[4, 4.5, 5].map((r) => <option key={r} value={r}>{r}.0+ Minimal Rating</option>)}
+                  </select>
                 </div>
+              </div>
+
+              <div className="space-y-10">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-6">
+                  <h3 className="text-[11px] font-black text-neutral-900 uppercase tracking-[0.3em]">Molecular Profile Selection</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="h-1.5 w-12 bg-neutral-100 rounded-full overflow-hidden">
+                       <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(preferences.ingredients.length / 10) * 100}%` }}
+                        className="h-full bg-primary"
+                       />
+                    </div>
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase">{preferences.ingredients.length}/10</span>
+                  </div>
+                </div>
+                
+                <div className="grid gap-10">
+                  {INGREDIENT_GROUPS.map((group) => (
+                    <div key={group.label} className="space-y-5">
+                      <div className="flex items-center gap-3 text-neutral-300">
+                        {group.icon}
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">{group.label}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        {group.items.map((ing) => {
+                          const isActive = preferences.ingredients.includes(ing);
+                          return (
+                            <button
+                              key={ing}
+                              type="button"
+                              onClick={() => handleIngredientChange(ing)}
+                              className={clsx(
+                                "px-6 py-3 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all relative overflow-hidden group/btn",
+                                isActive 
+                                  ? "bg-neutral-900 text-white border-neutral-900 shadow-xl -translate-y-1" 
+                                  : "bg-white text-neutral-400 border-neutral-100 hover:border-neutral-900 hover:text-neutral-900"
+                              )}
+                            >
+                              <div className="flex items-center gap-3 relative z-10">
+                                {isActive && <motion.div layoutId="check"><CheckCircle2 size={14} className="text-primary" /></motion.div>}
+                                {ing}
+                              </div>
+                              {isActive && (
+                                <motion.div 
+                                  className="absolute inset-0 bg-primary/10 pointer-events-none"
+                                  initial={{ x: '-100%' }}
+                                  animate={{ x: '100%' }}
+                                  transition={{ repeat: Infinity, duration: 1.5 }}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-12 border-t border-neutral-100 space-y-10">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em]">Economic Parameters (Budget)</label>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm font-bold text-neutral-300 italic">IDR</span>
+                      <span className="text-7xl font-black font-outfit tracking-tighter text-neutral-900 leading-none">
+                        {parseInt(preferences.priceRange).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1 max-w-md pb-6">
+                    <input
+                      type="range"
+                      name="priceRange"
+                      min="30000"
+                      max="500000"
+                      step="10000"
+                      value={preferences.priceRange}
+                      onChange={handleChange}
+                      className="w-full h-2 bg-neutral-100 rounded-full appearance-none cursor-pointer accent-neutral-900"
+                    />
+                    <div className="flex justify-between mt-4 text-[9px] font-black text-neutral-300 uppercase tracking-widest">
+                       <span>Min. 30k</span>
+                       <span>Max. 500k</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isScanning}
+                  className="premium-button w-full !py-8 text-sm flex items-center justify-center gap-6 group scale-100 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {isScanning ? (
+                    <Loader2 className="animate-spin" size={20} />
+                  ) : (
+                    <>
+                      EXECUTE CALCULATION PROTOCOL
+                      <ChevronRight size={20} className="group-hover:translate-x-3 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+
+          {/* Right: Live Data Profile */}
+          <motion.aside 
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-4 space-y-8 sticky top-32"
+          >
+            <div className="premium-card bg-neutral-900 text-white border-none space-y-10 relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] -mr-16 -mt-16 group-hover:bg-primary/40 transition-all duration-1000"></div>
+               
+               <div className="space-y-2 relative">
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Live Profiling</h3>
+                 <p className="text-3xl font-black uppercase tracking-tighter leading-none">Analysis Summary</p>
+               </div>
+
+               <div className="space-y-8 relative">
+                 <div className="space-y-3">
+                    <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest block">Operational Space</span>
+                    <p className="text-2xl font-black uppercase tracking-tight italic text-white capitalize">{preferences.category}</p>
+                 </div>
+                 
+                 <div className="space-y-4">
+                    <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest block">Kandungan Terdeteksi</span>
+                    <div className="flex flex-wrap gap-2">
+                      {preferences.ingredients.length > 0 ? (
+                        preferences.ingredients.map(ing => (
+                          <motion.span 
+                            initial={{ scale: 0 }} 
+                            animate={{ scale: 1 }} 
+                            key={ing} 
+                            className="text-[9px] font-black uppercase tracking-tighter px-3 py-1 bg-white/10 rounded-full border border-white/5 flex items-center gap-2"
+                          >
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(230,57,70,0.8)]"></div>
+                            {ing}
+                          </motion.span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-neutral-600 font-medium italic">Menunggu input user...</span>
+                      )}
+                    </div>
+                 </div>
+
+                 <div className="pt-8 border-t border-white/10 flex justify-between items-center">
+                    <div className="space-y-1">
+                       <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest block">Algorithm State</span>
+                       <span className="text-xs font-bold text-neutral-200">READY_FOR_COMPUTE</span>
+                    </div>
+                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center">
+                       <Zap size={20} className="text-primary" />
+                    </div>
+                 </div>
+               </div>
             </div>
+
+            <div className="premium-card bg-white border-neutral-100 space-y-6">
+               <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-neutral-900 flex items-center justify-center text-white">
+                     <ShieldCheck size={20} />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-widest italic text-neutral-900">Lab Standards</span>
+               </div>
+               <p className="text-[11px] font-medium text-neutral-400 leading-relaxed uppercase tracking-wider">
+                Sistem menggunakan Dataset Terbaru 2024 untuk menjamin validasi kemiripan bahan aktif yang akurat.
+               </p>
+            </div>
+          </motion.aside>
+
         </div>
-      </section>
-
-      {/* Form Section - Neat Floating Consultation */}
-      <section id="consultation" className="py-32 px-6">
-        <div className="max-w-4xl mx-auto space-y-16">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-serif font-medium text-neutral-900">Mulai Konsultasi</h2>
-            <p className="text-neutral-400 font-light text-lg">Wujudkan profil kecantikan ideal Anda sekarang.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="luxury-card p-10 md:p-16 space-y-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="group space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 pl-1">Kategori Produk</label>
-                <select name="category" value={preferences.category} onChange={handleChange} className="input-field" required>
-                  <option value="">Pilih Kategori</option>
-                  {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-                </select>
-              </div>
-
-              <div className="group space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 pl-1">Brand Favorit</label>
-                <select name="brand" value={preferences.brand} onChange={handleChange} className="input-field">
-                  <option value="">Semua Brand</option>
-                  {BRANDS.map((brand) => <option key={brand} value={brand}>{brand}</option>)}
-                </select>
-              </div>
-
-              <div className="group space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 pl-1">Tipe Kulit</label>
-                <select name="skinType" value={preferences.skinType} onChange={handleChange} className="input-field" required>
-                  <option value="">Pilih Tipe Kulit</option>
-                  {SKIN_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-                </select>
-              </div>
-
-              <div className="group space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 pl-1">Pilihan Shade</label>
-                <select name="shade" value={preferences.shade} onChange={handleChange} className="input-field">
-                  <option value="">Semua Shade</option>
-                  {SHADES.map((shade) => <option key={shade} value={shade}>{shade}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-6 pt-6 border-t border-neutral-50">
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                <label>Batas Budget Maksimal</label>
-                <span className="text-neutral-900 bg-neutral-50 px-3 py-1 rounded-full">Rp {parseInt(preferences.priceRange).toLocaleString('id-ID')}</span>
-              </div>
-              <input
-                type="range"
-                name="priceRange"
-                min="30000"
-                max="500000"
-                step="10000"
-                value={preferences.priceRange}
-                onChange={handleChange}
-                className="w-full h-1 bg-neutral-100 rounded-full appearance-none cursor-pointer accent-neutral-900"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="btn-primary w-full py-5 text-base tracking-[0.2em] font-black"
-            >
-              DAPATKAN REKOMENDASI
-            </button>
-          </form>
-        </div>
-      </section>
+      </main>
     </div>
   );
 };

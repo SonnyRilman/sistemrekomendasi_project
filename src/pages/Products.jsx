@@ -1,15 +1,47 @@
-import { useState, useMemo } from 'react';
-import { Search, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
-import { DUMMY_PRODUCTS, BRANDS, CATEGORIES } from '../data/products';
+import { useState, useMemo, useEffect } from 'react';
+import { Search, ChevronDown, SlidersHorizontal, X, Filter, LayoutGrid, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { clsx } from 'clsx';
+import { BRANDS, CATEGORIES } from '../data/products';
 import ProductCard from '../components/ProductCard';
+import { apiService } from '../services/api';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getProducts();
+        if (response.products) {
+          const formatted = response.products.map(p => ({
+            id: p.id,
+            name: p.name,
+            brand: p.brand || 'Luxury Brand',
+            category: p.Category,
+            price: p.price,
+            rating: p.Rating,
+            image: `https://picsum.photos/seed/${p.id}/600/700`,
+            description: p.Deskripsi || 'Koleksi produk istimewa.'
+          }));
+          setProducts(formatted);
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllProducts();
+  }, []);
 
   const filteredProducts = useMemo(() => {
-    return DUMMY_PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           product.brand.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesBrand = selectedBrand === '' || product.brand === selectedBrand;
@@ -17,104 +49,164 @@ const Products = () => {
       
       return matchesSearch && matchesBrand && matchesCategory;
     });
-  }, [searchTerm, selectedBrand, selectedCategory]);
+  }, [searchTerm, selectedBrand, selectedCategory, products]);
 
   return (
-    <div className="bg-white min-h-screen pb-40">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <header className="flex flex-col md:flex-row md:items-end justify-between border-b border-neutral-100 pb-12 mb-12 gap-8">
+    <div className="bg-[#f5f5f5] min-h-screen pt-24 pb-24">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Header section */}
+        <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-16">
           <div className="space-y-4">
-            <h1 className="text-6xl font-serif font-medium text-neutral-900 tracking-tight">Koleksi Produk</h1>
-            <p className="text-neutral-400 font-light text-lg">Menemukan keindahan melalui sains dan presisi.</p>
+             <div className="inline-flex items-center gap-2 px-2 py-1 bg-white border border-neutral-100 shadow-sm rounded">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400">Inventory Overview</span>
+             </div>
+             <h1 className="text-4xl font-black text-neutral-900 tracking-tighter leading-none uppercase">
+                Premium <br/> <span className="text-neutral-300 italic">Catalogue</span>
+             </h1>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-6 w-full md:w-auto">
-            <div className="relative group">
-              <input
-                type="text"
-                placeholder="Cari..."
-                className="w-full md:w-64 py-3 bg-transparent border-b border-neutral-200 outline-none focus:border-neutral-900 transition-all font-light"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Search className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-300" />
+          <div className="relative group w-full xl:max-w-md">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+               <Search size={18} />
             </div>
-            
-            <div className="flex items-center space-x-6">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                {filteredProducts.length} Results
-              </div>
-            </div>
+            <input
+              type="text"
+              placeholder="Search by brand or chemical compound..."
+              className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-100 rounded-xl outline-none focus:ring-4 focus:ring-primary/5 transition-all font-bold text-sm text-neutral-800 shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
-          {/* Sidebar Filters */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          
+          {/* Filters Column */}
           <aside className="lg:col-span-3 space-y-12">
-            <div className="space-y-10">
-              <div className="space-y-6">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-900 border-l-2 border-neutral-900 pl-4">Category</h3>
-                <div className="flex flex-col space-y-3">
-                  <button
+            
+            <div className="space-y-6">
+               <div className="flex items-center gap-2 mb-2">
+                  <Filter size={16} className="text-neutral-400" />
+                  <span className="text-[11px] font-black uppercase tracking-widest text-neutral-900">Categories</span>
+               </div>
+               <div className="flex flex-wrap lg:flex-col gap-2">
+                 <button
                     onClick={() => setSelectedCategory('')}
-                    className={`text-left text-sm transition-all ${selectedCategory === '' ? 'font-black text-brand-600 tracking-wide' : 'font-light text-neutral-500 hover:text-neutral-900'}`}
+                    className={clsx(
+                      "tag-premium text-left",
+                      selectedCategory === '' ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                    )}
                   >
-                    Semua
+                    All Collection
                   </button>
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`text-left text-sm transition-all ${selectedCategory === cat ? 'font-black text-brand-600 tracking-wide' : 'font-light text-neutral-500 hover:text-neutral-900'}`}
+                      className={clsx(
+                        "tag-premium text-left capitalize",
+                        selectedCategory === cat ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                      )}
                     >
                       {cat}
                     </button>
                   ))}
-                </div>
-              </div>
+               </div>
+            </div>
 
-              <div className="space-y-6">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-900 border-l-2 border-neutral-900 pl-4">Brand</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  <button
+            <div className="space-y-6">
+               <div className="flex items-center gap-2 mb-2">
+                  <Sparkles size={16} className="text-neutral-400" />
+                  <span className="text-[11px] font-black uppercase tracking-widest text-neutral-900">Verified Brands</span>
+               </div>
+               <div className="flex flex-wrap lg:flex-col gap-2">
+                 <button
                     onClick={() => setSelectedBrand('')}
-                    className={`text-left text-sm transition-all ${selectedBrand === '' ? 'font-black text-brand-600 tracking-wide' : 'font-light text-neutral-500 hover:text-neutral-900'}`}
+                    className={clsx(
+                      "tag-premium text-left",
+                      selectedBrand === '' ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                    )}
                   >
-                    Semua
+                    Worldwide Brands
                   </button>
                   {BRANDS.map((brand) => (
                     <button
                       key={brand}
                       onClick={() => setSelectedBrand(brand)}
-                      className={`text-left text-sm transition-all ${selectedBrand === brand ? 'font-black text-brand-600 tracking-wide' : 'font-light text-neutral-500 hover:text-neutral-900'}`}
+                      className={clsx(
+                        "tag-premium text-left",
+                        selectedBrand === brand ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                      )}
                     >
                       {brand}
                     </button>
                   ))}
-                </div>
-              </div>
+               </div>
             </div>
           </aside>
 
-          {/* Product Grid */}
+          {/* Catalog Column */}
           <div className="lg:col-span-9">
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="py-40 text-center space-y-6">
-                <p className="text-3xl font-serif text-neutral-300">No results found.</p>
-                <button 
-                  onClick={() => {setSearchTerm(''); setSelectedBrand(''); setSelectedCategory('');}}
-                  className="text-xs font-bold uppercase tracking-widest border-b border-neutral-900 pb-1"
+            <div className="mb-10 flex items-center justify-between">
+               <div className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                  Showing <span className="text-neutral-900">{filteredProducts.length}</span> verified specimens
+               </div>
+               <div className="h-0.5 flex-1 mx-8 bg-neutral-100 rounded-full"></div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.div 
+                   key="loading"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   className="py-32 flex flex-col items-center justify-center space-y-6"
                 >
-                  Clear all filters
-                </button>
-              </div>
-            )}
+                  <div className="h-14 w-14 border-4 border-neutral-100 border-t-neutral-900 rounded-full animate-spin"></div>
+                  <p className="text-xs font-black text-neutral-400 uppercase tracking-widest">Querying Global Database...</p>
+                </motion.div>
+              ) : filteredProducts.length > 0 ? (
+                <motion.div 
+                   key="grid"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10"
+                >
+                  {filteredProducts.map((product, idx) => (
+                    <motion.div 
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-40 text-center space-y-8"
+                >
+                  <div className="w-20 h-20 bg-neutral-50 rounded-full mx-auto flex items-center justify-center text-neutral-200">
+                     <Search size={40} />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black uppercase tracking-tighter">No Specimens Found</h3>
+                    <p className="text-neutral-400 font-medium">Try adjusting your filtration parameters.</p>
+                  </div>
+                  <button 
+                    onClick={() => {setSearchTerm(''); setSelectedBrand(''); setSelectedCategory('');}}
+                    className="premium-button !px-8 !py-4"
+                  >
+                    Reset Parameters
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>

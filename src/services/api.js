@@ -7,12 +7,11 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const apiService = {
   /**
-   * Fetch all products or filtered products
+   * Fetch all products from backend
    */
-  async getProducts(params = {}) {
+  async getProducts() {
     try {
-      const query = new URLSearchParams(params).toString();
-      const response = await fetch(`${BASE_URL}/api/products?${query}`);
+      const response = await fetch(`${BASE_URL}/api/products/`);
       if (!response.ok) throw new Error('Failed to fetch products');
       return await response.json();
     } catch (error) {
@@ -22,31 +21,17 @@ export const apiService = {
   },
 
   /**
-   * Get product details by ID
-   */
-  async getProductById(id) {
-    try {
-      const response = await fetch(`${BASE_URL}/api/products/${id}`);
-      if (!response.ok) throw new Error('Product not found');
-      return await response.json();
-    } catch (error) {
-      console.error('API Error (getProductById):', error);
-      throw error;
-    }
-  },
-
-  /**
    * POST preferences to get recommendations
-   * @param {Object} preferences - { category, brand, skinType, shade, priceRange }
+   * @param {Object} data - { kategori_produk, rating, pilihan_ingredients, budget_max }
    */
-  async getRecommendations(preferences) {
+  async getRecommendations(data) {
     try {
-      const response = await fetch(`${BASE_URL}/api/recommendation`, {
+      const response = await fetch(`${BASE_URL}/api/preprocessing/rekomendasi_start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(preferences),
+        body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error('Failed to fetch recommendations');
       return await response.json();
@@ -56,3 +41,4 @@ export const apiService = {
     }
   }
 };
+

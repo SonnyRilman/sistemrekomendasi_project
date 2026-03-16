@@ -80,6 +80,7 @@ export const DUMMY_PRODUCTS = [
 ];
 
 export const BRANDS = ["Wardah", "Make Over", "Emina", "Somethinc", "Maybelline", "Purbasari"];
-export const CATEGORIES = ["Foundation", "Lipstick", "Blush", "Powder"];
+export const CATEGORIES = ["powder", "foundation", "cushion", "blushon"];
 export const SKIN_TYPES = ["Oily", "Dry", "Combination", "Sensitive"];
 export const SHADES = ["Natural Beige", "Skyline", "Pink", "Translucent", "128 Warm Nude", "81 Diamond"];
+

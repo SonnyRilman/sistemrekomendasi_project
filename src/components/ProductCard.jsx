@@ -1,54 +1,48 @@
-import { ArrowRight, Star } from 'lucide-react';
+import { Star, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   return (
-    <div className="card-editorial group cursor-pointer block">
-      <Link to={`/products/${product.id}`} className="block">
-        <div className="aspect-[3/4] overflow-hidden relative rounded-xl bg-neutral-50 shadow-sm border border-neutral-50">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-          />
-          <div className="absolute top-4 left-4">
-             <span className="text-[9px] font-black uppercase tracking-widest bg-white/90 backdrop-blur-sm px-2 py-1 rounded">
-               {product.brand}
-             </span>
-          </div>
+    <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden flex flex-col h-full hover:border-neutral-900 transition-all group shadow-sm">
+      {/* Product Image */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100 border-b border-neutral-100">
+        <img
+          src={product.image || `https://picsum.photos/seed/${product.id}/500/600`}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+          <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded text-[10px] font-black text-neutral-900 uppercase tracking-widest border border-neutral-100">
+            {product.brand}
+          </span>
         </div>
-      </Link>
+      </div>
       
-      <div className="py-5 space-y-2">
-        <div className="flex justify-between items-start">
-          <h3 className="text-sm font-bold text-neutral-900 line-clamp-1 group-hover:text-brand-600 transition-colors uppercase tracking-tight">
+      {/* Product Body */}
+      <div className="p-6 flex flex-col flex-1 gap-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">{product.category}</span>
+            <div className="flex items-center gap-1">
+              <Star size={12} className="fill-yellow-400 text-yellow-400" />
+              <span className="text-xs font-bold text-neutral-600">{product.rating}</span>
+            </div>
+          </div>
+          <h3 className="text-lg font-black text-neutral-900 leading-tight uppercase tracking-tight line-clamp-2">
             {product.name}
           </h3>
         </div>
         
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-light text-neutral-400">
-            {product.category}
-          </p>
-          <div className="flex items-center text-[10px] font-bold text-neutral-800">
-             <span className="mr-1">{product.rating}</span>
-             <div className="flex text-neutral-300">
-               {[...Array(5)].map((_, i) => (
-                 <div key={i} className={`w-1 h-3 rounded-full mx-[1px] ${i < Math.floor(product.rating) ? 'bg-brand-400' : 'bg-neutral-100'}`}></div>
-               ))}
-             </div>
+        <div className="mt-auto pt-4 border-t border-neutral-50 flex items-center justify-between">
+          <div className="text-xl font-black font-outfit tracking-tighter">
+            <span className="text-[10px] font-bold mr-1 text-neutral-300 italic">Rp</span>
+            {product.price.toLocaleString('id-ID')}
           </div>
-        </div>
-
-        <div className="pt-2 flex items-center justify-between">
-          <span className="text-base font-bold text-neutral-900">
-            Rp {product.price.toLocaleString('id-ID')}
-          </span>
-          <Link
+          <Link 
             to={`/products/${product.id}`}
-            className="text-[10px] font-black uppercase tracking-tighter text-neutral-900 flex items-center group-hover:text-brand-600 transition-all"
+            className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-400 hover:bg-neutral-900 hover:text-white hover:border-neutral-900 transition-all"
           >
-            Details <ArrowRight className="ml-1 h-3 w-3" />
+            <ChevronRight size={18} />
           </Link>
         </div>
       </div>

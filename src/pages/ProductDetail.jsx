@@ -1,131 +1,193 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Shield, Truck, RefreshCcw, Share2, Plus } from 'lucide-react';
-import { DUMMY_PRODUCTS } from '../data/products';
+import { ArrowLeft, ArrowRight, Shield, Truck, RefreshCcw, Share2, Plus, Star, MapPin, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { apiService } from '../services/api';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const foundProduct = DUMMY_PRODUCTS.find((p) => p.id === parseInt(id));
-    if (foundProduct) {
-      setProduct(foundProduct);
-    }
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getProducts();
+        const foundProduct = response.products.find((p) => p.id === parseInt(id));
+        if (foundProduct) {
+          setProduct({
+            id: foundProduct.id,
+            name: foundProduct.name,
+            brand: foundProduct.brand || 'Luxury Brand',
+            category: foundProduct.Category,
+            price: foundProduct.price,
+            rating: foundProduct.Rating,
+            image: `https://picsum.photos/seed/${foundProduct.id}/800/800`,
+            description: foundProduct.Deskripsi || 'Detail produk istimewa.',
+            shade: foundProduct.shades || '-',
+            skinType: foundProduct.skinType || 'All types',
+            ingredients: foundProduct.ingredients || 'Data bahan aktif tidak tersedia.'
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProduct();
     window.scrollTo(0, 0);
   }, [id]);
 
-  if (!product) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-neutral-100 border-t-neutral-900 rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#fafafa]">
+        <div className="w-12 h-12 border-4 border-neutral-100 border-t-neutral-900 rounded-full animate-spin"></div>
+        <p className="mt-4 text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400">Loading Specification</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white min-h-screen pb-24">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="flex items-center space-x-2 text-neutral-400 text-[9px] font-bold uppercase tracking-widest mb-10">
-          <button onClick={() => navigate('/')} className="hover:text-neutral-900">Home</button>
-          <span>/</span>
-          <button onClick={() => navigate('/products')} className="hover:text-neutral-900">Collections</button>
-          <span>/</span>
-          <span className="text-neutral-900 line-clamp-1 truncate max-w-[150px]">{product.name}</span>
-        </div>
+    <div className="bg-[#f5f5f5] min-h-screen pb-24 pt-24">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Breadcrumb */}
+        <motion.div 
+           initial={{ opacity: 0, x: -10 }}
+           animate={{ opacity: 1, x: 0 }}
+           className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-neutral-400 mb-8"
+        >
+          <button onClick={() => navigate('/')} className="hover:text-neutral-900 transition-colors">Lab</button>
+          <div className="w-1 h-px bg-neutral-200"></div>
+          <button onClick={() => navigate('/products')} className="hover:text-neutral-900 transition-colors">Specimens</button>
+          <div className="w-1 h-px bg-neutral-200"></div>
+          <span className="text-neutral-900 font-black">{product.name}</span>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-          {/* Gallery Column */}
-          <div className="space-y-6">
-            <div className="aspect-square bg-neutral-50 rounded-2xl overflow-hidden shadow-sm border border-neutral-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Product Image Column */}
+          <motion.div 
+             initial={{ opacity: 0, scale: 0.98 }}
+             animate={{ opacity: 1, scale: 1 }}
+             className="lg:col-span-6 relative group"
+          >
+            <div className="bg-white border border-neutral-100 rounded-2xl overflow-hidden aspect-square shadow-sm">
               <img
                 src={product.image}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
             </div>
-          </div>
+            <div className="flex gap-3 mt-4">
+               {[1, 2, 3].map(i => (
+                 <div key={i} className="flex-1 aspect-square rounded-xl border border-neutral-100 overflow-hidden cursor-pointer hover:border-neutral-900 transition-all shadow-sm">
+                    <img src={`https://picsum.photos/seed/${product.id + i}/200/200`} className="w-full h-full object-cover" alt="view" />
+                 </div>
+               ))}
+            </div>
+          </motion.div>
 
-          {/* Info Column */}
-          <div className="space-y-10">
-            <div className="space-y-6">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-600">
+          {/* Product Info Column */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-6 space-y-8"
+          >
+            <div className="space-y-4">
+              <div className="space-y-2">
+                 <div className="bg-neutral-100 text-neutral-500 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded inline-block border border-neutral-200">
                     {product.brand}
-                  </span>
-                  <h1 className="text-3xl md:text-4xl font-serif font-medium leading-tight text-neutral-900">
+                 </div>
+                 <h1 className="text-4xl md:text-5xl font-black font-outfit text-neutral-900 uppercase tracking-tighter leading-[1.1]">
                     {product.name}
-                  </h1>
+                 </h1>
+              </div>
+
+              <div className="flex items-end gap-8">
+                <div className="space-y-1">
+                   <div className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Retail Price</div>
+                   <div className="text-4xl font-black font-outfit tracking-tighter">
+                      <span className="text-sm font-bold mr-1 italic text-neutral-300">Rp</span>
+                      {product.price.toLocaleString('id-ID')}
+                   </div>
                 </div>
-                <button className="p-2.5 border border-neutral-100 rounded-full hover:bg-neutral-50 transition-all">
-                  <Share2 className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-6">
-                <p className="text-xl font-bold text-neutral-900">
-                  Rp {product.price.toLocaleString('id-ID')}
-                </p>
-                <div className="h-3 w-px bg-neutral-200"></div>
-                <div className="flex items-center text-[9px] uppercase font-bold text-neutral-400 tracking-widest">
-                  <span className="text-neutral-900 mr-2">{product.rating}</span>
-                  Rating Score
+                <div className="pb-1">
+                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 text-white rounded-lg">
+                      <Star size={12} className="fill-yellow-400 text-yellow-400" />
+                      <span className="text-xs font-black">{product.rating}</span>
+                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-[9px] font-black uppercase tracking-widest text-neutral-900">Description</h3>
-              <p className="text-neutral-500 font-light leading-relaxed text-sm italic">
-                "{product.description}"
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 py-6 border-y border-neutral-50">
-              <div className="space-y-1">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Shade</span>
-                <p className="font-bold text-neutral-900 text-sm">{product.shade}</p>
+            <div className="grid grid-cols-2 gap-4 pb-8 border-b border-neutral-100">
+              <div className="bg-neutral-50 p-5 rounded-2xl border border-neutral-100">
+                 <div className="text-[8px] font-black text-neutral-400 uppercase tracking-widest mb-1">Optical Shade</div>
+                 <p className="font-black text-base text-neutral-900 tracking-tight">{product.shade}</p>
               </div>
-              <div className="space-y-1">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Tipe Kulit</span>
-                <p className="font-bold text-neutral-900 text-sm">{product.skinType}</p>
+              <div className="bg-neutral-50 p-5 rounded-2xl border border-neutral-100">
+                 <div className="text-[8px] font-black text-neutral-400 uppercase tracking-widest mb-1">Dermal Compatibility</div>
+                 <p className="font-black text-base text-neutral-900 uppercase tracking-tight">{product.skinType}</p>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-[9px] font-black uppercase tracking-widest text-neutral-900">Ingredients</h3>
-              <p className="text-xs text-neutral-400 font-light italic leading-loose">
-                {product.ingredients}
-              </p>
+            <div className="space-y-4">
+               <h3 className="text-[9px] font-black text-neutral-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  Detailed Formulation
+               </h3>
+               <p className="text-neutral-500 text-base leading-relaxed font-medium">
+                {product.description}
+               </p>
             </div>
 
-            <div className="space-y-4 pt-2">
-              <button
-                onClick={() => navigate('/recommendations', { state: { product } })}
-                className="btn-primary w-full flex justify-between items-center group py-4 px-8"
-              >
-                <span className="text-xs tracking-widest uppercase font-bold">Rekomendasikan Serupa</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
-              </button>
+            <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
+              <h3 className="text-[9px] font-black text-neutral-900 uppercase tracking-[0.2em]">Active Ingredients</h3>
+              <div className="flex flex-wrap gap-1.5">
+                 {product.ingredients.split(',').map((ing, i) => (
+                   <span key={i} className="text-[9px] font-bold bg-neutral-50 px-2.5 py-1 rounded-md text-neutral-600 border border-neutral-100">{ing.trim()}</span>
+                 ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 pt-6 opacity-40 grayscale group-hover:grayscale-0 transition-all border-t border-neutral-50">
-              <div className="text-center space-y-1.5">
-                <Shield className="h-4 w-4 mx-auto" />
-                <span className="text-[7px] font-bold uppercase tracking-widest">Authentic</span>
+            <div className="flex gap-3 pt-6">
+               <button 
+                 onClick={() => navigate('/recommendations', { state: { payload: {
+                   kategori_produk: product.category,
+                   rating: product.rating,
+                   pilihan_ingredients: [],
+                   budget_max: product.price + 50000
+                 } } })}
+                 className="primary-btn flex-1 py-4 text-xs"
+               >
+                  Identify Similar Specimens
+               </button>
+               <button className="w-14 h-14 rounded-xl border border-neutral-200 flex items-center justify-center text-neutral-400 hover:bg-neutral-900 hover:text-white hover:border-neutral-900 transition-all shadow-sm">
+                  <Plus size={24} />
+               </button>
+            </div>
+
+            {/* Guarantees */}
+            <div className="grid grid-cols-3 gap-6 pt-10 border-t border-neutral-100">
+              <div className="flex flex-col items-center gap-2">
+                 <Shield size={18} className="text-neutral-300" />
+                 <span className="text-[8px] font-black uppercase text-neutral-400 tracking-widest text-center">Authenticity Verified</span>
               </div>
-              <div className="text-center space-y-1.5">
-                <Truck className="h-4 w-4 mx-auto" />
-                <span className="text-[7px] font-bold uppercase tracking-widest">Premium Care</span>
+              <div className="flex flex-col items-center gap-2">
+                 <Truck size={18} className="text-neutral-300" />
+                 <span className="text-[8px] font-black uppercase text-neutral-400 tracking-widest text-center">Express Logistics</span>
               </div>
-              <div className="text-center space-y-1.5">
-                <RefreshCcw className="h-4 w-4 mx-auto" />
-                <span className="text-[7px] font-bold uppercase tracking-widest">14 Day Return</span>
+              <div className="flex flex-col items-center gap-2">
+                 <RefreshCcw size={18} className="text-neutral-300" />
+                 <span className="text-[8px] font-black uppercase text-neutral-400 tracking-widest text-center">Easy Returns Cycle</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

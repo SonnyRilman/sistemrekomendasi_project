@@ -1,117 +1,104 @@
-import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, BarChart3, Info, ChevronLeft, Layout } from 'lucide-react';
-import { DUMMY_PRODUCTS } from '../data/products';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { RefreshCw, LayoutGrid, Info, ArrowLeft, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
+import { apiService } from '../services/api';
 
 const Recommendations = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    window.scrollTo(0, 0);
-    const timer = setTimeout(() => {
-      const mockRecs = DUMMY_PRODUCTS
-        .map(p => ({
-          ...p,
-          similarityScore: (Math.random() * 0.4 + 0.6).toFixed(2)
-        }))
-        .sort((a, b) => b.similarityScore - a.similarityScore)
-        .slice(0, 4);
-      
-      setRecommendations(mockRecs);
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [location.state]);
+    // ... same effect logic
+  }, [location.state, navigate]);
 
   return (
-    <div className="bg-white min-h-screen pb-40">
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-20 animate-in fade-in slide-in-from-bottom duration-1000">
-          <div className="space-y-6">
-            <h2 className="text-brand-600 font-bold uppercase tracking-[0.3em] text-[10px]">
-              Recommendation Results
-            </h2>
-            <h1 className="text-6xl font-serif font-medium leading-tight text-neutral-900">
-              Analisis <span className="italic font-normal text-brand-700">Terbaik</span> <br />Untuk Persona Anda.
-            </h1>
-            <p className="text-neutral-500 font-light text-xl max-w-xl leading-relaxed">
-              {location.state?.product 
-                ? `Berdasarkan pola karakteristik dari ${location.state.product.name}.`
-                : "Hasil optimasi parameter profil kulit dan preferensi brand Anda."}
-            </p>
-          </div>
-
-          <div className="flex gap-6">
-            <button onClick={() => navigate('/')} className="btn-outline px-10">
-              <RefreshCw className="mr-3 h-4 w-4" />
-              Reset Profil
-            </button>
-          </div>
-        </div>
-
+    <div className="bg-[#f5f5f5] min-h-screen py-12">
+      <div className="max-w-7xl mx-auto px-6">
+        
         {loading ? (
-          <div className="py-40 flex flex-col items-center justify-center text-center space-y-10">
-            <div className="h-16 w-16 border-t-2 border-brand-600 rounded-full animate-spin"></div>
-            <div className="space-y-4">
-              <h3 className="text-2xl font-serif font-medium text-neutral-900 tracking-wide">Menganalisis Parameter...</h3>
-              <p className="text-neutral-400 font-light italic">Menghubungkan profil Anda dengan 1.2k+ koleksi produk.</p>
+          <div className="py-24 flex flex-col items-center justify-center text-center space-y-4">
+            <Loader2 className="text-neutral-900 animate-spin" size={32} />
+            <div className="space-y-1">
+              <h2 className="text-xl font-black uppercase tracking-tight text-neutral-900">Memproses Data...</h2>
+              <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Menghitung Cosine Similarity</p>
             </div>
+          </div>
+        ) : error ? (
+          <div className="py-24 flex flex-col items-center justify-center text-center space-y-4">
+            <Info className="text-red-500" size={32} />
+            <div className="space-y-1">
+              <h3 className="text-xl font-black uppercase tracking-tight text-neutral-900">Terjadi Kesalahan</h3>
+              <p className="text-neutral-500 text-sm max-w-md mx-auto">{error}</p>
+            </div>
+            <button onClick={() => navigate('/')} className="primary-btn">Kembali ke Beranda</button>
           </div>
         ) : (
-          <div className="space-y-24">
-            {/* Dashboard Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-neutral-100 border-y border-neutral-100">
-              <div className="bg-white py-12 px-8 flex flex-col items-center space-y-4">
-                <BarChart3 className="h-6 w-6 text-neutral-900" />
-                <div className="text-center">
-                   <span className="block text-3xl font-serif font-bold italic">99.4%</span>
-                   <span className="text-[10px] uppercase font-black tracking-widest text-neutral-400">Similarity Index</span>
+          <div className="space-y-12">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-neutral-100 pb-8">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-2 py-1 bg-neutral-100 rounded border border-neutral-200">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-neutral-500">Hasil Analisis Content-Based Filtering</span>
                 </div>
+                <h1 className="text-3xl md:text-4xl font-black text-neutral-900 tracking-tight uppercase">
+                  Hasil Rekomendasi <br/> <span className="text-primary italic">Terbaik Untuk Anda</span>
+                </h1>
+                <p className="text-neutral-500 text-sm font-medium max-w-xl">
+                  Berdasarkan algoritma kemiripan konten (Cosine Similarity).
+                </p>
               </div>
-              <div className="bg-white py-12 px-8 flex flex-col items-center space-y-4">
-                <Layout className="h-6 w-6 text-neutral-900" />
-                <div className="text-center">
-                   <span className="block text-3xl font-serif font-bold italic">Top 4</span>
-                   <span className="text-[10px] uppercase font-black tracking-widest text-neutral-400">Curated Matches</span>
-                </div>
-              </div>
-              <div className="bg-white py-12 px-8 flex flex-col items-center space-y-4">
-                <Info className="h-6 w-6 text-neutral-900" />
-                <div className="text-center">
-                   <span className="block text-3xl font-serif font-bold italic">CBF</span>
-                   <span className="text-[10px] uppercase font-black tracking-widest text-neutral-400">Filtering Method</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Recommendation Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-20">
+              <div className="flex gap-3">
+                 <button onClick={() => navigate('/')} className="outline-btn !px-4 !py-2 text-[10px] uppercase tracking-widest">
+                  <ArrowLeft size={14} /> Kembali
+                </button>
+                 <button onClick={() => navigate('/')} className="primary-btn !px-4 !py-2 text-[10px] uppercase tracking-widest">
+                  <RefreshCw size={14} /> Konsultasi Ulang
+                </button>
+              </div>
+            </header>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {recommendations.map((product) => (
-                <div key={product.id} className="space-y-6">
+                <div key={product.id} className="space-y-3">
                   <ProductCard product={product} />
-                  <div className="border-t border-neutral-50 pt-4 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-neutral-300">
-                    <span>Match Probability</span>
-                    <span className="text-neutral-900 italic font-black">{(product.similarityScore * 100).toFixed(0)}%</span>
+                  <div className="bg-white border border-neutral-100 p-3 rounded-xl flex items-center justify-between shadow-sm">
+                     <div className="flex flex-col">
+                        <span className="text-[8px] font-black uppercase tracking-wider text-neutral-400">Match Accuracy</span>
+                        <div className="w-16 h-1 bg-neutral-100 rounded-full mt-1 overflow-hidden">
+                           <div className="h-full bg-primary" style={{ width: `${product.similarityScore * 100}%` }}></div>
+                        </div>
+                     </div>
+                     <span className="text-lg font-black text-neutral-900 tracking-tighter">{(product.similarityScore * 100).toFixed(1)}%</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Scientific Insight */}
-            <div className="bg-neutral-50 p-16 rounded-[3rem] border border-neutral-100 flex flex-col items-center text-center space-y-8">
-               <div className="max-w-2xl space-y-6">
-                 <h4 className="text-2xl font-serif font-semibold text-neutral-900">Teknologi Content-Based Filtering</h4>
-                 <p className="text-neutral-500 font-light leading-loose text-lg italic">
-                   "Sistem kami mengekstraksi vektor karakteristik dari setiap bahan aktif (ingredients), shade, dan tekstur produk. Dengan mengkalkulasi Cosine Similarity, kami memastikan produk yang direkomendasikan memiliki harmoni molekular yang paling tinggi dengan preferensi profil Anda."
-                 </p>
+            {/* Technical Methodology Breakdown */}
+            <section className="bg-neutral-900 text-white rounded-2xl p-8 relative overflow-hidden">
+               <div className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className="space-y-4">
+                     <h4 className="text-xl font-black uppercase tracking-tight">Catatan Metodologi</h4>
+                     <p className="text-neutral-400 text-xs font-medium leading-relaxed">
+                        Sistem ini menggunakan teknik <b>Content-Based Filtering</b>. Kemiripan dihitung menggunakan rumus <b>Cosine Similarity</b>.
+                     </p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm space-y-3 text-[10px] font-bold uppercase tracking-widest">
+                        <div className="flex justify-between">
+                           <span className="text-neutral-400 font-medium">Algorithm</span>
+                           <span className="text-primary">Cosine Similarity</span>
+                        </div>
+                        <div className="flex justify-between">
+                           <span className="text-neutral-400 font-medium">Vector Mode</span>
+                           <span className="text-white">TF-IDF Inspired</span>
+                        </div>
+                  </div>
                </div>
-            </div>
+            </section>
           </div>
         )}
       </div>

@@ -24,7 +24,7 @@ def load_preprocessing_data_rating():
     return df
 
 def load_preprocessing_data_ingredients_tfidf():
-    df = pd.read_excel('data/ingredient_preprocessing.xlsx', header=33)
+    df = pd.read_excel('data/ingredient_preprocessing.xlsx', header=341)
 
     # Hapus kolom "Unnamed" yang muncul karena sel kosong di Excel
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]

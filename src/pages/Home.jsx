@@ -74,7 +74,7 @@ const Home = () => {
     <div className="bg-[#f5f5f5] min-h-screen">
       
       {/* Dynamic Hero Section - High End Visual */}
-      <section className="relative h-[70vh] flex items-center overflow-hidden bg-neutral-900">
+      <section className="relative min-h-[500px] md:min-h-[700px] flex items-start overflow-hidden bg-neutral-900 pt-32 pb-20">
         <div className="absolute inset-0 z-0">
           <img 
             src="/skincare_lab_hero_minimalist_1773682856998.png" 
@@ -82,29 +82,23 @@ const Home = () => {
             alt="Lab Background"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#f5f5f5] via-neutral-900/50 to-neutral-900/70"></div>
-          {/* Animated scanning line for hero */}
-          <motion.div 
-            animate={{ top: ['0%', '100%', '0%'] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-[10vh] bg-primary/10 blur-3xl z-10 pointer-events-none"
-          />
         </div>
 
-        <div className="section-container relative z-10 w-full">
+        <div className="max-w-[1400px] mx-auto px-6 relative z-10 w-full">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-3xl space-y-8"
+            className="max-w-4xl space-y-6"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full border border-white/10">
-              <Beaker size={16} className="text-primary animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Advanced Analysis Protocol v2.0</span>
+              <Beaker size={14} className="text-primary animate-pulse" />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white">Advanced Analysis Protocol v2.0</span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.85] uppercase tracking-tighter">
+            <h1 className="text-[clamp(3.5rem,10vw,7rem)] font-black text-white leading-[0.8] uppercase tracking-tighter">
               Digital <br/> <span className="text-primary italic">Skin Lab</span>
             </h1>
-            <p className="text-xl text-neutral-300 font-medium leading-relaxed max-w-xl">
+            <p className="text-lg md:text-xl text-neutral-300 font-medium leading-relaxed max-w-xl">
               Precision skincare recommendations powered by <b>Content-Based Filtering</b> and molecular similarity profiling.
             </p>
           </motion.div>
@@ -112,14 +106,14 @@ const Home = () => {
       </section>
 
       {/* Main Consultation Area */}
-      <main className="section-container -mt-24 pb-40 relative z-20">
-        <div className="grid lg:grid-cols-12 gap-10 items-start">
+      <main className="max-w-[1400px] mx-auto px-6 -mt-32 pb-40 relative z-20">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
           
           {/* Left: Input Form Card */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="lg:col-span-8 bg-white border border-neutral-200 rounded-[3rem] p-12 md:p-16 shadow-xl shadow-neutral-900/5 relative overflow-hidden"
+            className="xl:col-span-8 bg-white border border-neutral-200 rounded-[3rem] p-8 md:p-16 shadow-xl shadow-neutral-900/5 relative overflow-hidden"
           >
             {/* Scanning Overlay */}
             <AnimatePresence>
@@ -279,7 +273,7 @@ const Home = () => {
           <motion.aside 
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-4 space-y-8 sticky top-32"
+            className="xl:col-span-4 space-y-8 sticky top-32"
           >
             <div className="premium-card bg-neutral-900 text-white border-none space-y-10 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] -mr-16 -mt-16 group-hover:bg-primary/40 transition-all duration-1000"></div>

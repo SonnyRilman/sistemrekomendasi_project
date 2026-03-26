@@ -26,7 +26,7 @@ const Products = () => {
             category: p.Category,
             price: p.price,
             rating: p.Rating,
-            image: `https://picsum.photos/seed/${p.id}/600/700`,
+            image: `https://source.unsplash.com/featured/?${p.Category.replace('-', ',')},skincare,makeup`,
             description: p.Deskripsi || 'Koleksi produk istimewa.'
           }));
           setProducts(formatted);
@@ -83,66 +83,68 @@ const Products = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
           {/* Filters Column */}
-          <aside className="lg:col-span-3 space-y-12">
-            
-            <div className="space-y-6">
-               <div className="flex items-center gap-2 mb-2">
-                  <Filter size={16} className="text-neutral-400" />
-                  <span className="text-[11px] font-black uppercase tracking-widest text-neutral-900">Categories</span>
-               </div>
-               <div className="flex flex-wrap lg:flex-col gap-2">
-                 <button
-                    onClick={() => setSelectedCategory('')}
-                    className={clsx(
-                      "tag-premium text-left",
-                      selectedCategory === '' ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
-                    )}
-                  >
-                    All Collection
-                  </button>
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
+          <aside className="lg:col-span-3">
+            <div className="sticky top-32 space-y-12 max-h-[calc(100vh-10rem)] overflow-y-auto pr-4 custom-scrollbar">
+              
+              <div className="space-y-6">
+                 <div className="flex items-center gap-2 mb-2 sticky top-0 bg-[#f5f5f5] py-2 z-10">
+                    <Filter size={16} className="text-neutral-400" />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-neutral-900">Categories</span>
+                 </div>
+                 <div className="flex flex-wrap lg:flex-col gap-1.5">
+                   <button
+                      onClick={() => setSelectedCategory('')}
                       className={clsx(
-                        "tag-premium text-left capitalize",
-                        selectedCategory === cat ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                        "tag-premium text-left !py-2.5 !px-4 text-[10px]",
+                        selectedCategory === '' ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
                       )}
                     >
-                      {cat}
+                      All Collection
                     </button>
-                  ))}
-               </div>
-            </div>
-
-            <div className="space-y-6">
-               <div className="flex items-center gap-2 mb-2">
-                  <Sparkles size={16} className="text-neutral-400" />
-                  <span className="text-[11px] font-black uppercase tracking-widest text-neutral-900">Verified Brands</span>
-               </div>
-               <div className="flex flex-wrap lg:flex-col gap-2">
-                 <button
-                    onClick={() => setSelectedBrand('')}
-                    className={clsx(
-                      "tag-premium text-left",
-                      selectedBrand === '' ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
-                    )}
-                  >
-                    Worldwide Brands
-                  </button>
-                  {BRANDS.map((brand) => (
-                    <button
-                      key={brand}
-                      onClick={() => setSelectedBrand(brand)}
+                    {CATEGORIES.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={clsx(
+                          "tag-premium text-left capitalize !py-2.5 !px-4 text-[10px]",
+                          selectedCategory === cat ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                        )}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                 </div>
+              </div>
+  
+              <div className="space-y-6 pb-10">
+                 <div className="flex items-center gap-2 mb-2 sticky top-0 bg-[#f5f5f5] py-2 z-10">
+                    <Sparkles size={16} className="text-neutral-400" />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-neutral-900">Verified Brands</span>
+                 </div>
+                 <div className="flex flex-wrap lg:flex-col gap-1.5">
+                   <button
+                      onClick={() => setSelectedBrand('')}
                       className={clsx(
-                        "tag-premium text-left",
-                        selectedBrand === brand ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                        "tag-premium text-left !py-2.5 !px-4 text-[10px]",
+                        selectedBrand === '' ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
                       )}
                     >
-                      {brand}
+                      Worldwide Brands
                     </button>
-                  ))}
-               </div>
+                    {BRANDS.map((brand) => (
+                      <button
+                        key={brand}
+                        onClick={() => setSelectedBrand(brand)}
+                        className={clsx(
+                          "tag-premium text-left !py-2.5 !px-4 text-[10px]",
+                          selectedBrand === brand ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-100"
+                        )}
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                 </div>
+              </div>
             </div>
           </aside>
 

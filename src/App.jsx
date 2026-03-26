@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Recommendations from './pages/Recommendations';
+import Evaluation from './pages/Evaluation';
 import { Mail, ShieldCheck, Database, LayoutPanelLeft } from 'lucide-react';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/evaluation" element={<Evaluation />} />
           </Routes>
         </main>
         

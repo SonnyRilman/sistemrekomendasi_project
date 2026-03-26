@@ -11,6 +11,7 @@ const Navbar = () => {
     { name: 'Beranda', path: '/' },
     { name: 'Katalog Produk', path: '/products' },
     { name: 'Rekomendasi', path: '/recommendations' },
+    { name: 'Evaluasi', path: '/evaluation' },
   ];
 
   return (
@@ -44,12 +45,6 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <Link 
-            to="/recommendations" 
-            className="primary-btn !py-2 !px-6 text-xs"
-          >
-            Mulai Konsultasi
-          </Link>
         </div>
 
         {/* Mobile menu trigger */}
@@ -78,14 +73,7 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Link 
-              to="/recommendations"
-              className="primary-btn w-full mt-4"
-              onClick={() => setIsOpen(false)}
-            >
-              Mulai Konsultasi
-            </Link>
-          </div>
+            </div>
         </div>
       )}
     </nav>

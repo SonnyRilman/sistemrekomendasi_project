@@ -39,6 +39,19 @@ export const apiService = {
       console.error('API Error (getRecommendations):', error);
       throw error;
     }
+  },
+  /**
+   * Fetch evaluation metrics from backend
+   */
+  async getEvaluation() {
+    try {
+      const response = await fetch(`${BASE_URL}/api/evaluate`);
+      if (!response.ok) throw new Error('Failed to fetch evaluation');
+      return await response.json();
+    } catch (error) {
+      console.error('API Error (getEvaluation):', error);
+      throw error;
+    }
   }
 };
 

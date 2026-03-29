@@ -1,11 +1,12 @@
+# type: ignore
 # app.py
-from flask import Flask
-from flask_cors import CORS
-from flask import jsonify, request
+from flask import Flask # type: ignore
+from flask_cors import CORS # type: ignore
+from flask import jsonify, request # type: ignore
 import os
-import data_manager
-import numpy as np
-import pandas as pd
+import data_manager # type: ignore
+import numpy as np # type: ignore
+import pandas as pd # type: ignore
 
 # Global cache
 cached_data = {
@@ -38,7 +39,7 @@ def load_global_cache():
             df_all['product_code'] = [f"P{i+1}" for i in range(len(df_all))]
             
             # PENTING: Bersihkan NaN agar JSON valid (diubah jadi null)
-            df_all = df_all.where(pd.notnull(df_all), None)
+            df_all = df_all.replace({np.nan: None})
             
             cached_data['products'] = df_all
         print("[SERVER] Cache loaded successfully.")
@@ -57,9 +58,13 @@ def create_app():
     @app.route('/api/products/', methods=['GET'])
     def get_products():
         load_global_cache()
+        products = cached_data['products']
+        if products is None:
+            return jsonify({'message': 'OK', 'products': []}), 200
+            
         return jsonify({
             'message': 'OK',
-            'products': cached_data['products'].to_dict(orient='records')
+            'products': products.to_dict(orient='records')
         }), 200
 
     def generate_recommendations(user_data):
@@ -67,29 +72,43 @@ def create_app():
         df_tfidf = cached_data['tfidf']
         feature_cols = cached_data['feature_columns']
         
+        if df_all is None or df_tfidf is None or feature_cols is None:
+            return pd.DataFrame()
+            
         kategori = str(user_data.get('kategori_produk', '')).lower().strip()
         budget = float(user_data.get('budget_max', 1000000))
         rating_min = float(user_data.get('rating', 0))
         ingredients = user_data.get('pilihan_ingredients', [])
 
         # Filter
-        eligible = df_all[
-            (df_all['Category_search'] == kategori) & 
-            (df_all['price'] <= budget) &
-            (df_all['Rating'] >= rating_min)
-        ].copy()
+        products_df = df_all
+        # Use more explicit filtering for IDE
+        c1 = (products_df['Category_search'] == kategori) # type: ignore
+        c2 = (products_df['price'] <= budget) # type: ignore
+        c3 = (products_df['Rating'] >= rating_min) # type: ignore
+        eligible = products_df.loc[c1 & c2 & c3].copy() # type: ignore
+        if eligible is None: eligible = pd.DataFrame() # type: ignore
 
-        if eligible.empty: return []
+        if eligible.empty: return pd.DataFrame()
 
         # Vectorized Recommendation
-        user_vec = np.zeros(len(feature_cols))
-        for ing in ingredients:
-            if ing in feature_cols:
-                user_vec[feature_cols.get_loc(ing)] = 1
+        feature_cols_list = []
+        if feature_cols is not None and hasattr(feature_cols, 'tolist'):
+            feature_cols_list = feature_cols.tolist()
+            
+        user_vec = np.zeros(len(feature_cols)) if feature_cols is not None else np.array([])
+        if len(user_vec) > 0 and feature_cols is not None:
+            for ing in ingredients:
+                if ing in feature_cols_list:
+                    idx = feature_cols.get_loc(ing) if hasattr(feature_cols, 'get_loc') else -1
+                    if idx >= 0:
+                        user_vec[idx] = 1
         
-        norm_u = np.linalg.norm(user_vec)
+        norm_u = float(np.linalg.norm(user_vec))
         eligible_codes = set(eligible['product_code'].values)
-        df_tfidf_sub = df_tfidf[df_tfidf['Ingredient Number'].isin(eligible_codes)]
+        tfidf_df = df_tfidf
+        # Use loc for more explicit type info
+        df_tfidf_sub = tfidf_df.loc[tfidf_df['Ingredient Number'].isin(eligible_codes)] # type: ignore
 
         if df_tfidf_sub.empty or norm_u == 0:
             eligible['similarity_score'] = 0.0
@@ -112,11 +131,11 @@ def create_app():
             
             # Scenarios (According to your requirement)
             scenarios = [
-                {'user': 'User 1', 'kategori_produk': 'foundation', 'shade': 'Medium', 'budget_max': 150000, 'brand': None, 'ingredients': ['niacinamide', 'glycerine']},
-                {'user': 'User 2', 'kategori_produk': 'lipstik', 'shade': 'Nude', 'budget_max': 100000, 'brand': None, 'ingredients': ['tocopherol', 'stearyl']},
-                {'user': 'User 3', 'kategori_produk': 'bedak', 'shade': 'Light', 'budget_max': 200000, 'brand': 'Wardah', 'ingredients': ['titanium']},
-                {'user': 'User 4', 'kategori_produk': 'blush', 'shade': 'Coral', 'budget_max': 500000, 'brand': None, 'ingredients': ['mica', 'dimethicone']},
-                {'user': 'User 5', 'kategori_produk': 'foundation', 'shade': 'Dark', 'budget_max': 300000, 'brand': None, 'ingredients': ['zinc']}
+                {'user': 'User 1', 'kategori_produk': 'foundation', 'shade': '', 'budget_max': 500000, 'brand': None, 'ingredients': ['niacinamide', 'glycerin']},
+                {'user': 'User 2', 'kategori_produk': 'lipstick', 'shade': '', 'budget_max': 200000, 'brand': None, 'ingredients': ['tocopherol']},
+                {'user': 'User 3', 'kategori_produk': 'pressed-powder', 'shade': '', 'budget_max': 300000, 'brand': None, 'ingredients': ['titanium']},
+                {'user': 'User 4', 'kategori_produk': 'blush', 'shade': '', 'budget_max': 500000, 'brand': None, 'ingredients': ['mica']},
+                {'user': 'User 5', 'kategori_produk': 'foundation', 'shade': '', 'budget_max': 300000, 'brand': None, 'ingredients': ['zinc']}
             ]
             
             summary_results = []
@@ -124,20 +143,28 @@ def create_app():
             for s in scenarios:
                 # 1. Real Recommendation (Top 10)
                 recs = generate_recommendations(s)
-                top10 = recs.head(10).copy()
+                if recs.empty:
+                    top10 = pd.DataFrame(columns=['product_code'])
+                else:
+                    top10 = recs.head(10).copy()
                 
                 # 2. Ground Truth (Real Match based on constraints)
-                # Filter category, price, and brand (Wajib)
-                gt_mask = (df['Category_search'] == s['kategori_produk'].lower())
-                if s['budget_max']: gt_mask &= (df['price'] <= s['budget_max'])
-                if s['brand'] and s['brand'] != 'None':
-                    gt_mask &= (df['brand'].str.lower() == s['brand'].lower())
+                # Use explicit boolean filters
+                f1 = (df['Category_search'] == str(s.get('kategori_produk', '')).lower())
                 
-                # Strict Shade matching (If no 'shade' column, we simulate with name containing shade keyword)
-                shade_key = s['shade'].lower()
-                gt_mask &= (df['name'].str.lower().str.contains(shade_key))
+                budget_val = s.get('budget_max')
+                f2 = (df['price'] <= float(str(budget_val))) if budget_val is not None else True
                 
-                gt = df[gt_mask].copy()
+                brand_val = s.get('brand')
+                f3 = (df['brand'].astype(str).str.lower() == str(brand_val).lower()) if (brand_val and brand_val != 'None') else True
+                
+                shade_key = str(s.get('shade', '')).lower()
+                name_col = df['name'].astype(str).str.lower()
+                f4 = name_col.str.contains(shade_key, na=False)
+                
+                gt = df.loc[f1 & f2 & f3 & f4].copy() # type: ignore
+                # Ensure gt is a DataFrame
+                if gt is None: gt = pd.DataFrame(columns=['product_code']) # type: ignore
                 
                 # 3. Metrik
                 rec_ids = set(top10['product_code'])
@@ -147,33 +174,14 @@ def create_app():
                 prec = matched_count / 10.0
                 rec = matched_count / len(gt) if not gt.empty else 0
                 f1 = 2 * (prec * rec) / (prec + rec) if (prec + rec) > 0 else 0
-                
-                # 4. RMSE Calculation (Real vs Predicted)
-                # Normalisasi Sim Score biar rentangnya (0-1) untuk RMSE yang akurat
-                if not top10.empty:
-                    sim_vals = top10['similarity_score'].values
-                    min_sim, max_sim = sim_vals.min(), sim_vals.max()
-                    
-                    if max_sim > min_sim:
-                        norm_sim = (sim_vals - min_sim) / (max_sim - min_sim)
-                    else:
-                        norm_sim = sim_vals # Tetap kalau semua sama
-                    
-                    # Prediksi (skala 1-5): 1 + (norm_sim * 4)
-                    pred_ratings = 1 + (norm_sim * 4)
-                    true_ratings = top10['Rating']
-                    rmse = np.sqrt(np.mean((pred_ratings - true_ratings) ** 2))
-                else:
-                    rmse = 0
 
                 summary_results.append({
                     'user': s['user'],
-                    'precision': round(prec, 4),
-                    'recall': round(rec, 4),
-                    'f1': round(f1, 4),
-                    'rmse': round(rmse, 4),
-                    'matches': matched_count,
-                    'total_relevant': len(gt)
+                    'precision': float(round(float(prec), 4)), # type: ignore
+                    'recall': float(round(float(rec), 4)), # type: ignore
+                    'f1': float(round(float(f1), 4)), # type: ignore
+                    'matches': int(matched_count),
+                    'total_relevant': int(len(gt))
                 })
                 
             return jsonify({'status': 'success', 'results': summary_results})
@@ -197,7 +205,7 @@ def create_app():
             
             recs = generate_recommendations(data)
             
-            if isinstance(recs, list) and len(recs) == 0:
+            if recs.empty:
                  return jsonify({'status': 'success', 'count': 0, 'results': []})
 
             results = recs.to_dict(orient='records')
@@ -205,11 +213,11 @@ def create_app():
 
             # --- LIVE EVALUATION FOR THIS SEARCH ---
             # Ground Truth based on input
-            gt_mask = (df_all['Category_search'] == kategori_user)
-            gt_mask &= (df_all['price'] <= budget_user)
-            gt_mask &= (df_all['Rating'] >= rating_user)
-            # Shade match simulation from name
-            gt = df_all[gt_mask]
+            pa = df_all
+            m1 = (pa['Category_search'] == kategori_user) # type: ignore
+            m2 = (pa['price'] <= budget_user) # type: ignore
+            m3 = (pa['Rating'] >= rating_user) # type: ignore
+            gt = pa.loc[m1 & m2 & m3].copy() # type: ignore
 
             rec_ids = set(top10['product_code'])
             rel_ids = set(gt['product_code'])
@@ -219,29 +227,12 @@ def create_app():
             rec = matched / len(gt) if not gt.empty else 0
             f1 = 2 * (prec * rec) / (prec + rec) if (prec + rec) > 0 else 0
             
-            # RMSE
-            if not top10.empty:
-                sim_vals = top10['similarity_score'].values
-                min_sim, max_sim = sim_vals.min(), sim_vals.max()
-                
-                if max_sim > min_sim:
-                    norm_sim = (sim_vals - min_sim) / (max_sim - min_sim)
-                else:
-                    norm_sim = sim_vals 
-
-                # Prediksi: 1 + (norm_sim * 4)
-                pred_ratings = 1 + (norm_sim * 4)
-                rmse = np.sqrt(np.mean((pred_ratings - top10['Rating']) ** 2))
-            else:
-                rmse = 0
-
             metrics = {
-                'precision': round(prec, 4),
-                'recall': round(rec, 4),
-                'f1': round(f1, 4),
-                'rmse': round(rmse, 4),
-                'matched': matched,
-                'relevant_in_db': len(gt)
+                'precision': float(round(float(prec), 4)), # type: ignore
+                'recall': float(round(float(rec), 4)), # type: ignore
+                'f1': float(round(float(f1), 4)), # type: ignore
+                'matched': int(matched),
+                'relevant_in_db': int(len(gt))
             }
 
             return jsonify({

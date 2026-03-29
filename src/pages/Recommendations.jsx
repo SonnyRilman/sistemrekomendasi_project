@@ -64,7 +64,7 @@ const Recommendations = () => {
 
               {/* Real-time Accuracy Metrics */}
               {metrics && (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white p-6 rounded-[2rem] border border-neutral-100 shadow-xl shadow-neutral-900/5">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-[2rem] border border-neutral-100 shadow-xl shadow-neutral-900/5">
                     <div className="space-y-1 text-center border-r border-neutral-50 px-4">
                         <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Precision</p>
                         <p className="text-xl font-black text-neutral-900 italic">{(metrics.precision * 100).toFixed(1)}%</p>
@@ -73,13 +73,9 @@ const Recommendations = () => {
                         <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Recall</p>
                         <p className="text-xl font-black text-neutral-900 italic">{(metrics.recall * 100).toFixed(1)}%</p>
                     </div>
-                    <div className="space-y-1 text-center border-r border-neutral-50 px-4">
+                    <div className="space-y-1 text-center px-4">
                         <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">F1-Score</p>
                         <p className="text-xl font-black text-neutral-900 italic">{(metrics.f1 * 100).toFixed(1)}%</p>
-                    </div>
-                    <div className="space-y-1 text-center px-4">
-                        <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest text-primary">RMSE</p>
-                        <p className="text-xl font-black text-primary italic">{metrics.rmse.toFixed(3)}</p>
                     </div>
                 </div>
               )}

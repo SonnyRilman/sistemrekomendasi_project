@@ -4,6 +4,19 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { apiService } from '../services/api';
 
+const getProductImage = (category) => {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('powder')) return '/powder.png';
+  if (cat.includes('lipstick') || cat.includes('lip-tint') || cat.includes('lip-cream')) return '/lipstick.png';
+  if (cat.includes('blush')) return '/blush.png';
+  if (cat.includes('cushion')) return '/cushion.png';
+  if (cat.includes('serum')) return '/serum.png';
+  if (cat.includes('mask')) return '/sheet-mask.png';
+  if (cat.includes('wash') || cat.includes('cleanser')) return '/cleanser.png';
+  if (cat.includes('sunscreen')) return '/sunscreen.png';
+  return '/serum.png';
+};
+
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -17,14 +30,15 @@ const ProductDetail = () => {
         const response = await apiService.getProducts();
         const foundProduct = response.products.find((p) => p.id === parseInt(id));
         if (foundProduct) {
+          const category = foundProduct.Category || '';
           setProduct({
             id: foundProduct.id,
             name: foundProduct.name,
             brand: foundProduct.brand || 'Luxury Brand',
-            category: foundProduct.Category,
+            category: category,
             price: foundProduct.price,
             rating: foundProduct.Rating,
-            image: `https://picsum.photos/seed/${foundProduct.id}/800/800`,
+            image: getProductImage(category),
             description: foundProduct.Deskripsi || 'Detail produk istimewa.',
             shade: foundProduct.shades || '-',
             skinType: foundProduct.skinType || 'All types',
@@ -86,7 +100,7 @@ const ProductDetail = () => {
             <div className="flex gap-3 mt-4">
                {[1, 2, 3].map(i => (
                  <div key={i} className="flex-1 aspect-square rounded-xl border border-neutral-100 overflow-hidden cursor-pointer hover:border-neutral-900 transition-all shadow-sm">
-                    <img src={`https://picsum.photos/seed/${product.id + i}/200/200`} className="w-full h-full object-cover" alt="view" />
+                    <img src={product.image} className="w-full h-full object-cover" alt="view" />
                  </div>
                ))}
             </div>

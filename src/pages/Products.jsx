@@ -12,6 +12,13 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12;
+
+  useEffect(() => {
+    // Reset page to 1 whenever filters change
+    setCurrentPage(1);
+  }, [searchTerm, selectedBrand, selectedCategory]);
 
   useEffect(() => {
     const fetchAllProducts = async () => {
@@ -26,7 +33,6 @@ const Products = () => {
             category: p.Category,
             price: p.price,
             rating: p.Rating,
-            image: `https://source.unsplash.com/featured/?${p.Category.replace('-', ',')},skincare,makeup`,
             description: p.Deskripsi || 'Koleksi produk istimewa.'
           }));
           setProducts(formatted);
@@ -40,6 +46,12 @@ const Products = () => {
     fetchAllProducts();
   }, []);
 
+  const availableBrands = useMemo(() => {
+    if (!products.length) return [];
+    const uniqueBrands = [...new Set(products.map(p => p.brand).filter(Boolean))];
+    return uniqueBrands.sort();
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -50,6 +62,17 @@ const Products = () => {
       return matchesSearch && matchesBrand && matchesCategory;
     });
   }, [searchTerm, selectedBrand, selectedCategory, products]);
+
+  // Pagination Logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen pt-24 pb-24">
@@ -131,7 +154,7 @@ const Products = () => {
                     >
                       Worldwide Brands
                     </button>
-                    {BRANDS.map((brand) => (
+                    {availableBrands.map((brand) => (
                       <button
                         key={brand}
                         onClick={() => setSelectedBrand(brand)}
@@ -173,18 +196,40 @@ const Products = () => {
                    key="grid"
                    initial={{ opacity: 0 }}
                    animate={{ opacity: 1 }}
-                   className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10"
+                   className="space-y-16"
                 >
-                  {filteredProducts.map((product, idx) => (
-                    <motion.div 
-                      key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10">
+                    {currentProducts.map((product, idx) => (
+                      <motion.div 
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                      >
+                        <ProductCard product={product} />
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Pagination UI */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 pt-10">
+                      {[...Array(totalPages)].map((_, i) => (
+                        <button
+                          key={i + 1}
+                          onClick={() => paginate(i + 1)}
+                          className={clsx(
+                            "w-12 h-12 rounded-2xl font-black text-xs transition-all border",
+                            currentPage === i + 1 
+                              ? "bg-neutral-900 text-white border-neutral-900 shadow-xl shadow-neutral-900/10" 
+                              : "bg-white text-neutral-400 border-neutral-100 hover:border-neutral-900 hover:text-neutral-900"
+                          )}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ) : (
                 <motion.div 

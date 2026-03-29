@@ -5,12 +5,31 @@ import { motion } from 'framer-motion';
 const ProductCard = ({ product, isRecommendation = false }) => {
   const matchPercentage = product.similarityScore ? (product.similarityScore * 100).toFixed(1) : 0;
 
+  const getProductImage = () => {
+    if (product.image && !product.image.includes('loremflickr') && !product.image.includes('unsplash')) {
+      return product.image;
+    }
+
+    const category = (product.category || product.Category || '').toLowerCase();
+    
+    if (category.includes('powder')) return '/powder.png';
+    if (category.includes('lipstick') || category.includes('lip-tint') || category.includes('lip-cream')) return '/lipstick.png';
+    if (category.includes('blush')) return '/blush.png';
+    if (category.includes('cushion')) return '/cushion.png';
+    if (category.includes('serum')) return '/serum.png';
+    if (category.includes('mask')) return '/sheet-mask.png';
+    if (category.includes('wash') || category.includes('cleanser')) return '/cleanser.png';
+    if (category.includes('sunscreen')) return '/sunscreen.png';
+    
+    return product.image || '/serum.png';
+  };
+
   return (
     <div className="bg-white border border-neutral-200 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-neutral-900 transition-all group shadow-sm hover:shadow-2xl hover:shadow-neutral-900/5">
       {/* Product Image Section */}
       <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
         <img
-          src={product.image || `https://source.unsplash.com/featured/?${(product.category || 'beauty').replace('-', ',')},skincare,makeup`}
+          src={getProductImage()}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
         />

@@ -8,6 +8,6 @@ export const CATEGORIES = [
   "cleansing-balm", "body-wash", "shampoo", "conditioner", "hair-mask"
 ];
 
-export const BRANDS = ["Wardah", "Make Over", "Emina", "Somethinc", "Maybelline", "Purbasari"];
+export const BRANDS = [];
 export const SKIN_TYPES = ["Oily", "Dry", "Combination", "Sensitive"];
 export const DUMMY_PRODUCTS = []; // Simplified for production

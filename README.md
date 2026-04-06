@@ -1,16 +1,76 @@
-# React + Vite
+# Sistem Rekomendasi Kosmetik
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistem ini adalah aplikasi berbasis web yang dirancang untuk memberikan rekomendasi produk kosmetik berdasarkan preferensi pengguna, seperti kategori produk, anggaran (budget), rating minimal, dan kandungan bahan (ingredients). Sistem ini menggunakan teknik Content-Based Filtering dengan algoritma TF-IDF (Term Frequency - Inverse Document Frequency) untuk mencocokkan profil bahan produk dengan preferensi pengguna.
 
-Currently, two official plugins are available:
+## Struktur Proyek
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Proyek ini terbagi menjadi dua bagian utama:
 
-## React Compiler
+1.  **Frontend (React + Vite)**: Menyediakan antarmuka pengguna yang interaktif dan responsif untuk memasukkan kriteria pencarian dan menampilkan hasil rekomendasi.
+2.  **Backend (Flask)**: Berfungsi sebagai API server yang mengolah data produk dari file Excel, menghitung skor kemiripan bahan menggunakan TF-IDF, dan mengembalikan hasil rekomendasi ke frontend.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Teknologi yang Digunakan
 
-## Expanding the ESLint configuration
+### Frontend
+- React.js
+- Vite (sebagai build tool)
+- Tailwind CSS (untuk styling)
+- Framer Motion (untuk animasi UI)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Backend
+- Python 3.x
+- Flask (Web Framework)
+- Pandas (Manipulasi data)
+- NumPy (Operasi matriks dan numerik)
+- Flask-CORS (Penanganan integrasi lintas domain)
+
+### Data
+- Dataset disimpan dalam format Excel (.xlsx) di direktori `backend/data/`.
+- Perhitungan kemiripan dilakukan berdasarkan kolom bahan produk yang telah diproses.
+
+## Cara Menjalankan Sistem
+
+Pastikan Anda telah menginstal Node.js dan Python di sistem Anda sebelum memulai.
+
+### Langkah 1: Persiapan Backend
+
+1.  Buka terminal dan navigasikan ke direktori utama proyek.
+2.  Aktifkan lingkungan virtual Python (venv):
+    ```powershell
+    .\venv\Scripts\activate
+    ```
+3.  Masuk ke direktori backend:
+    ```powershell
+    cd backend
+    ```
+4.  Jalankan server Flask:
+    ```powershell
+    python app.py
+    ```
+    Server backend akan berjalan secara default pada alamat http://localhost:5000.
+
+### Langkah 2: Persiapan Frontend
+
+1.  Buka terminal baru (biarkan terminal backend tetap berjalan).
+2.  Navigasikan ke direktori utama proyek.
+3.  Instal dependensi Node.js (hanya perlu dilakukan sekali):
+    ```bash
+    npm install
+    ```
+4.  Jalankan server pengembangan Vite:
+    ```bash
+    npm run dev
+    ```
+    Aplikasi frontend akan tersedia pada alamat http://localhost:5173.
+
+## Fitur Utama
+
+- Pencarian produk berdasarkan kategori (seperti lipstick, foundation, pressed-powder, dll).
+- Filter berdasarkan rentang harga atau budget maksimal.
+- Filter berdasarkan rating minimal produk dari pengguna lain.
+- Rekomendasi tingkat lanjut berdasarkan kesesuaian bahan (ingredients) menggunakan perhitungan skor similarity.
+- Tampilan detail produk yang informatif.
+
+## Catatan Tambahan
+
+Aplikasi ini memerlukan kedua komponen (Frontend dan Backend) untuk berjalan secara bersamaan agar fungsi rekomendasi dapat bekerja sepenuhnya. Jika Anda melakukan perubahan pada dataset Excel, pastikan untuk memulai ulang server backend agar perubahan data dapat dimuat kembali ke dalam sistem.
